@@ -1,1 +1,667 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mistic Barbería | Reservá tu turno</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#0b0b0d;
+color:#f5f3ee;
+}
+
+.container{
+max-width:600px;
+margin:auto;
+padding:20px;
+}
+
+.logo{
+width:90px;
+height:90px;
+border:2px solid #c9a45b;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:20px auto;
+font-size:35px;
+font-weight:bold;
+color:#c9a45b;
+}
+
+h1{
+text-align:center;
+letter-spacing:3px;
+}
+
+.subtitle{
+text-align:center;
+color:#aaa;
+margin-bottom:30px;
+}
+
+.card{
+background:#17171a;
+border:1px solid #2d2d31;
+border-radius:18px;
+padding:20px;
+margin-bottom:18px;
+}
+
+h2{
+font-size:20px;
+margin-top:0;
+}
+
+.services{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.service{
+background:#101012;
+border:1px solid #333;
+border-radius:10px;
+padding:15px;
+color:white;
+cursor:pointer;
+text-align:left;
+}
+
+.service strong{
+display:block;
+margin-bottom:5px;
+}
+
+.service span{
+color:#aaa;
+font-size:13px;
+}
+
+.service.selected{
+border-color:#c9a45b;
+}
+
+label{
+display:block;
+color:#aaa;
+font-size:14px;
+margin-bottom:6px;
+}
+
+input,select{
+width:100%;
+padding:13px;
+border-radius:10px;
+border:1px solid #333;
+background:#101012;
+color:white;
+font-size:16px;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.horarios{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+margin-top:15px;
+}
+
+.hora{
+background:#101012;
+border:1px solid #333;
+color:white;
+padding:12px 5px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.hora.selected{
+background:#c9a45b;
+color:#111;
+}
+
+.hora.ocupado{
+opacity:.25;
+cursor:not-allowed;
+}
+
+.resumen{
+background:#101012;
+padding:15px;
+border-radius:10px;
+line-height:1.7;
+margin-bottom:15px;
+}
+
+.confirmar{
+width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+background:#c9a45b;
+color:#111;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.whatsapp{
+width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+background:#25D366;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+.oculto{
+display:none;
+}
+
+.exito{
+text-align:center;
+}
+
+.check{
+font-size:60px;
+color:#c9a45b;
+}
+
+.error{
+color:#ff8d8d;
+margin-top:10px;
+font-size:14px;
+}
+
+@media(max-width:500px){
+
+.row{
+grid-template-columns:1fr;
+}
+
+.services{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+M
+</div>
+
+<h1>MISTIC BARBERÍA</h1>
+
+<div class="subtitle">
+Reservá tu turno online
+</div>
+
+
+<div id="formulario">
+
+<div class="card">
+
+<h2>1. Elegí tu servicio</h2>
+
+<div class="services">
+
+<button class="service" onclick="servicio('Corte',this)">
+<strong>✂️ Corte</strong>
+<span>30 minutos</span>
+</button>
+
+<button class="service" onclick="servicio('Barba',this)">
+<strong>🧔 Barba</strong>
+<span>30 minutos</span>
+</button>
+
+<button class="service" onclick="servicio('Corte + Barba',this)">
+<strong>✂️ Corte + Barba</strong>
+<span>60 minutos</span>
+</button>
+
+<button class="service" onclick="servicio('Perfilado',this)">
+<strong>✨ Perfilado</strong>
+<span>20 minutos</span>
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>2. Elegí fecha y horario</h2>
+
+<div class="row">
+
+<div>
+
+<label>Fecha</label>
+
+<input
+type="date"
+id="fecha"
+onchange="actualizarHorarios()">
+
+</div>
+
+<div>
+
+<label>Barbero</label>
+
+<select id="barbero" onchange="actualizarHorarios()">
+
+<option>Barbero 1</option>
+<option>Barbero 2</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="horarios" id="horarios"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>3. Tus datos</h2>
+
+<div class="row">
+
+<div>
+
+<label>Nombre</label>
+
+<input
+id="nombre"
+placeholder="Tu nombre">
+
+</div>
+
+<div>
+
+<label>WhatsApp</label>
+
+<input
+id="telefono"
+placeholder="299 123 4567">
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>4. Confirmar turno</h2>
+
+<div class="resumen" id="resumen">
+
+Elegí servicio, fecha y horario.
+
+</div>
+
+<button
+class="confirmar"
+onclick="confirmar()">
+
+CONFIRMAR TURNO
+
+</button>
+
+<div
+class="error"
+id="error">
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="exito"
+class="card exito oculto">
+
+<div class="check">
+✓
+</div>
+
+<h2>¡Turno reservado!</h2>
+
+<p id="mensaje"></p>
+
+<button
+class="whatsapp"
+onclick="enviarWhatsApp()">
+
+📲 ENVIAR CONFIRMACIÓN POR WHATSAPP
+
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+let turno={
+servicio:"",
+fecha:"",
+hora:"",
+barbero:"Barbero 1",
+nombre:"",
+telefono:""
+};
+
+const horarios=[
+"09:00",
+"09:30",
+"10:00",
+"10:30",
+"11:00",
+"11:30",
+"12:00",
+"16:00",
+"16:30",
+"17:00",
+"17:30",
+"18:00",
+"18:30",
+"19:00",
+"19:30",
+"20:00",
+"20:30"
+];
+
+
+function servicio(nombre,boton){
+
+turno.servicio=nombre;
+
+document
+.querySelectorAll(".service")
+.forEach(x=>x.classList.remove("selected"));
+
+boton.classList.add("selected");
+
+actualizarResumen();
+
+}
+
+
+function actualizarHorarios(){
+
+turno.fecha=document.getElementById("fecha").value;
+
+turno.barbero=document.getElementById("barbero").value;
+
+turno.hora="";
+
+let contenedor=document.getElementById("horarios");
+
+contenedor.innerHTML="";
+
+let reservas=
+JSON.parse(
+localStorage.getItem("mistic_turnos") || "[]"
+);
+
+horarios.forEach(hora=>{
+
+let ocupado=
+reservas.some(t=>
+t.fecha===turno.fecha &&
+t.hora===hora &&
+t.barbero===turno.barbero
+);
+
+let boton=document.createElement("button");
+
+boton.className="hora";
+
+boton.innerText=hora;
+
+if(ocupado){
+
+boton.classList.add("ocupado");
+
+boton.disabled=true;
+
+}else{
+
+boton.onclick=()=>{
+
+turno.hora=hora;
+
+document
+.querySelectorAll(".hora")
+.forEach(x=>x.classList.remove("selected"));
+
+boton.classList.add("selected");
+
+actualizarResumen();
+
+};
+
+}
+
+contenedor.appendChild(boton);
+
+});
+
+actualizarResumen();
+
+}
+
+
+function actualizarResumen(){
+
+let resumen=document.getElementById("resumen");
+
+if(
+!turno.servicio ||
+!turno.fecha ||
+!turno.hora
+){
+
+resumen.innerText=
+"Elegí servicio, fecha y horario.";
+
+return;
+
+}
+
+let fecha=
+new Date(turno.fecha+"T12:00:00")
+.toLocaleDateString(
+"es-AR",
+{
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+}
+);
+
+resumen.innerHTML=
+"<strong>"+turno.servicio+"</strong><br>"+
+fecha+
+"<br>"+
+turno.hora+
+"<br>"+
+turno.barbero;
+
+}
+
+
+function confirmar(){
+
+let nombre=
+document.getElementById("nombre").value.trim();
+
+let telefono=
+document.getElementById("telefono").value.trim();
+
+let error=
+document.getElementById("error");
+
+error.innerText="";
+
+if(
+!turno.servicio ||
+!turno.fecha ||
+!turno.hora ||
+!nombre ||
+!telefono
+){
+
+error.innerText=
+"Completá todos los datos.";
+
+return;
+
+}
+
+turno.nombre=nombre;
+
+turno.telefono=telefono;
+
+let reservas=
+JSON.parse(
+localStorage.getItem("mistic_turnos") || "[]"
+);
+
+let ocupado=
+reservas.some(t=>
+t.fecha===turno.fecha &&
+t.hora===turno.hora &&
+t.barbero===turno.barbero
+);
+
+if(ocupado){
+
+error.innerText=
+"Ese horario ya está ocupado.";
+
+actualizarHorarios();
+
+return;
+
+}
+
+reservas.push(turno);
+
+localStorage.setItem(
+"mistic_turnos",
+JSON.stringify(reservas)
+);
+
+document
+.getElementById("formulario")
+.classList.add("oculto");
+
+document
+.getElementById("exito")
+.classList.remove("oculto");
+
+let fecha=
+new Date(turno.fecha+"T12:00:00")
+.toLocaleDateString(
+"es-AR",
+{
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+}
+);
+
+document.getElementById("mensaje").innerText=
+turno.nombre+
+", tu turno quedó reservado para el "+
+fecha+
+" a las "+
+turno.hora+
+" con "+
+turno.barbero+
+".";
+
+}
+
+
+function enviarWhatsApp(){
+
+let mensaje=
+"Hola Mistic Barbería 👋%0A%0A"+
+"Quiero confirmar mi turno:%0A%0A"+
+"✂️ Servicio: "+
+turno.servicio+
+"%0A📅 Fecha: "+
+turno.fecha+
+"%0A🕐 Hora: "+
+turno.hora+
+"%0A💈 Barbero: "+
+turno.barbero+
+"%0A👤 Nombre: "+
+turno.nombre+
+"%0A📱 WhatsApp: "+
+turno.telefono;
+
+window.open(
+"https://wa.me/5492984548329?text="+mensaje,
+"_blank"
+);
+
+}
+
+
+let hoy=
+new Date().toISOString().split("T")[0];
+
+document.getElementById("fecha").min=hoy;
+
+document.getElementById("fecha").value=hoy;
+
+actualizarHorarios();
+
+</script>
+
+</body>
+</html>
