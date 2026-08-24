@@ -1,667 +1,361 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MÍSTICO — Reserva de Turnos</title>
+    <style>
+        *{margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif;}
+        :root{--dorado:#d4af37; --azul-oscuro:#0a0f2b; --fondo:#0f1433; --gris:#1a1f45; --texto:#e0e0ff; --exito:#27ae60; --whatsapp:#25D366;}
+        body{background:var(--azul-oscuro); color:var(--texto); min-height:100vh; line-height:1.5;}
 
-<title>Mistic Barbería | Reservá tu turno</title>
+        /* CABECERA CON LOGO Y NOMBRE */
+        .cabecera{text-align:center; padding:30px 20px 20px; background:linear-gradient(to bottom, rgba(10,15,43,1), rgba(15,20,51,0));}
+        .logo{max-width:180px; max-height:180px; margin-bottom:15px; filter:drop-shadow(0 0 15px rgba(212,175,55,0.4));}
+        .nombre-mistico{color:var(--dorado); font-size:38px; font-weight:bold; letter-spacing:6px; margin-bottom:5px; text-shadow:0 0 20px rgba(212,175,55,0.3);}
+        .subtitulo{color:#9999cc; font-size:15px; letter-spacing:2px;}
 
-<style>
+        .nav{background:rgba(10,15,43,0.9); padding:12px 20px; display:flex; justify-content:center; gap:12px; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(212,175,55,0.2); backdrop-filter:blur(10px);}
+        .btn-nav{background:transparent; color:#e0e0ff; border:1px solid var(--dorado); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; transition:all 0.3s;}
+        .btn-nav.activo{background:var(--dorado); color:#000; font-weight:600;}
+        .btn-nav:hover{border-color:#e0c860;}
 
-*{
-box-sizing:border-box;
-}
+        .container{max-width:600px; margin:0 auto; padding:20px 15px;}
+        .oculto{display:none !important;}
 
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#0b0b0d;
-color:#f5f3ee;
-}
+        .card{background:var(--gris); border-radius:12px; padding:24px; margin-bottom:20px; border:1px solid rgba(212,175,55,0.15); box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+        h2{color:var(--dorado); margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.2); font-size:20px; letter-spacing:1px;}
 
-.container{
-max-width:600px;
-margin:auto;
-padding:20px;
-}
+        label{display:block; margin:14px 0 6px; color:#b0b0e0; font-size:14px; font-weight:500;}
+        input, select, button{width:100%; padding:14px; border:none; border-radius:8px; font-size:16px;}
+        input, select{background:var(--fondo); color:#fff; border:2px solid rgba(212,175,55,0.2); outline:none;}
+        input:focus, select:focus{border-color:var(--dorado);}
 
-.logo{
-width:90px;
-height:90px;
-border:2px solid #c9a45b;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-margin:20px auto;
-font-size:35px;
-font-weight:bold;
-color:#c9a45b;
-}
+        .btn{background:var(--dorado); color:#000; font-weight:700; margin-top:12px; cursor:pointer; border:none; transition:all 0.3s;}
+        .btn:hover{background:#e0c860; transform:translateY(-1px);}
 
-h1{
-text-align:center;
-letter-spacing:3px;
-}
+        .btn-whatsapp{background:var(--whatsapp); color:#fff; font-size:18px; padding:18px; font-weight:bold; border-radius:10px; cursor:pointer; margin-top:20px; width:100%; border:none; box-shadow:0 4px 20px rgba(37,211,102,0.3); text-decoration:none; display:block; text-align:center; transition:all 0.3s;}
+        .btn-whatsapp:hover{background:#12b850; transform:translateY(-2px);}
 
-.subtitle{
-text-align:center;
-color:#aaa;
-margin-bottom:30px;
-}
+        .resumen-turno{background:var(--fondo); border-radius:8px; padding:18px; margin:15px 0; line-height:2.2; font-size:15px; border-left:3px solid var(--dorado);}
+        .resumen-turno strong{color:var(--dorado);}
 
-.card{
-background:#17171a;
-border:1px solid #2d2d31;
-border-radius:18px;
-padding:20px;
-margin-bottom:18px;
-}
+        .aviso{background:rgba(50,40,20,0.5); border:1px solid rgba(212,175,55,0.3); border-radius:8px; padding:12px; margin:15px 0; color:#ffd700; font-size:14px; text-align:center;}
 
-h2{
-font-size:20px;
-margin-top:0;
-}
-
-.services{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.service{
-background:#101012;
-border:1px solid #333;
-border-radius:10px;
-padding:15px;
-color:white;
-cursor:pointer;
-text-align:left;
-}
-
-.service strong{
-display:block;
-margin-bottom:5px;
-}
-
-.service span{
-color:#aaa;
-font-size:13px;
-}
-
-.service.selected{
-border-color:#c9a45b;
-}
-
-label{
-display:block;
-color:#aaa;
-font-size:14px;
-margin-bottom:6px;
-}
-
-input,select{
-width:100%;
-padding:13px;
-border-radius:10px;
-border:1px solid #333;
-background:#101012;
-color:white;
-font-size:16px;
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.horarios{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:8px;
-margin-top:15px;
-}
-
-.hora{
-background:#101012;
-border:1px solid #333;
-color:white;
-padding:12px 5px;
-border-radius:8px;
-cursor:pointer;
-}
-
-.hora.selected{
-background:#c9a45b;
-color:#111;
-}
-
-.hora.ocupado{
-opacity:.25;
-cursor:not-allowed;
-}
-
-.resumen{
-background:#101012;
-padding:15px;
-border-radius:10px;
-line-height:1.7;
-margin-bottom:15px;
-}
-
-.confirmar{
-width:100%;
-padding:15px;
-border:0;
-border-radius:10px;
-background:#c9a45b;
-color:#111;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.whatsapp{
-width:100%;
-padding:15px;
-border:0;
-border-radius:10px;
-background:#25D366;
-color:white;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin-top:10px;
-}
-
-.oculto{
-display:none;
-}
-
-.exito{
-text-align:center;
-}
-
-.check{
-font-size:60px;
-color:#c9a45b;
-}
-
-.error{
-color:#ff8d8d;
-margin-top:10px;
-font-size:14px;
-}
-
-@media(max-width:500px){
-
-.row{
-grid-template-columns:1fr;
-}
-
-.services{
-grid-template-columns:1fr;
-}
-
-}
-
-</style>
+        .msg-exito{background:rgba(39,174,96,0.15); border:1px solid var(--exito); color:#90ffb0; padding:15px; border-radius:8px; margin:15px 0; text-align:center; font-weight:bold;}
+        
+        .btn-chico{width:auto; padding:8px 12px; font-size:13px; margin:0;}
+        .fila-botones{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
+    </style>
 </head>
-
 <body>
+
+<!-- CABECERA CON LOGO Y NOMBRE -->
+<div class="cabecera">
+    <img src="https://i.imgur.com/8ZxXQfL.png" alt="Logo Místico" class="logo">
+    <h1 class="nombre-mistico">MÍSTICO</h1>
+    <p class="subtitulo">Reserva tu turno</p>
+</div>
+
+<div class="nav">
+    <button class="btn-nav activo" id="btnReservar" onclick="mostrarSeccion('reservar')">📅 Reservar</button>
+    <button class="btn-nav" id="btnAdmin" onclick="mostrarSeccion('admin')">🔧 Configuración</button>
+</div>
 
 <div class="container">
 
-<div class="logo">
-M
-</div>
+<section id="reservar">
+    <div class="card">
+        <h2>📅 Pedí tu Turno</h2>
 
-<h1>MISTIC BARBERÍA</h1>
+        <div id="formReserva">
+            <label>1️⃣ Barbero *</label>
+            <select id="selBarbero" onchange="cargarHorarios()">
+                <option value="">— Elegí —</option>
+            </select>
 
-<div class="subtitle">
-Reservá tu turno online
-</div>
+            <label>2️⃣ Servicio *</label>
+            <select id="selServicio">
+                <option value="">— Elegí —</option>
+            </select>
 
+            <label>3️⃣ Fecha *</label>
+            <input type="date" id="selFecha" onchange="cargarHorarios()">
 
-<div id="formulario">
+            <label>4️⃣ Horario *</label>
+            <select id="selHorario">
+                <option value="">— Elegí barbero y fecha —</option>
+            </select>
 
-<div class="card">
+            <label>Tu Nombre Completo *</label>
+            <input type="text" id="inpNombre" placeholder="Ej: Juan Pérez">
 
-<h2>1. Elegí tu servicio</h2>
+            <label>Tu WhatsApp / Teléfono *</label>
+            <input type="tel" id="inpTel" placeholder="+54 9 294 ...">
 
-<div class="services">
+            <button class="btn" onclick="armarTurno()">✅ ARMAR TURNO</button>
+        </div>
 
-<button class="service" onclick="servicio('Corte',this)">
-<strong>✂️ Corte</strong>
-<span>30 minutos</span>
-</button>
+        <div id="seccionConfirmado" class="oculto">
+            <div class="msg-exito">✅ ¡TURNO CONFIRMADO!</div>
+            
+            <div class="resumen-turno">
+                <strong>👤 Cliente:</strong> <span id="resNombre"></span><br>
+                <strong>✂️ Barbero:</strong> <span id="resBarbero"></span><br>
+                <strong>💇 Servicio:</strong> <span id="resServicio"></span><br>
+                <strong>📅 Fecha:</strong> <span id="resFecha"></span><br>
+                <strong>⏰ Hora:</strong> <span id="resHora"></span>
+            </div>
 
-<button class="service" onclick="servicio('Barba',this)">
-<strong>🧔 Barba</strong>
-<span>30 minutos</span>
-</button>
+            <div class="aviso">👇 Tocá el botón verde — se abre WhatsApp con el mensaje ya listo</div>
 
-<button class="service" onclick="servicio('Corte + Barba',this)">
-<strong>✂️ Corte + Barba</strong>
-<span>60 minutos</span>
-</button>
+            <a id="botonWA" class="btn-whatsapp" href="" target="_blank" rel="noopener noreferrer">
+                💬 ENVIAR POR WHATSAPP
+            </a>
 
-<button class="service" onclick="servicio('Perfilado',this)">
-<strong>✨ Perfilado</strong>
-<span>20 minutos</span>
-</button>
+            <button class="btn" style="margin-top:20px; background:#333; color:#fff;" onclick="nuevoTurno()">🔄 Hacer otra reserva</button>
+        </div>
+    </div>
+</section>
 
-</div>
+<section id="admin" class="oculto">
+    <div class="card">
+        <h2>🔧 Configuración</h2>
 
-</div>
+        <label>Contraseña</label>
+        <input type="password" id="passAdmin" placeholder="Ingresar contraseña">
+        <button class="btn" onclick="ingresar()">Ingresar</button>
 
+        <div id="panelConfig" class="oculto" style="margin-top:25px;">
+            <h3>📱 Tu WhatsApp</h3>
+            <p style="color:#8888bb; font-size:13px; margin-bottom:10px;">Solo números, sin espacios, sin +<br>Formato: 549 + código + número</p>
+            <input type="tel" id="numWA" placeholder="Ej: 5492941234567">
+            <button class="btn" onclick="guardarNumero()">💾 GUARDAR</button>
+            <div id="guardadoOK" class="msg-exito oculto">✅ ¡Guardado correctamente!</div>
 
-<div class="card">
+            <h3 style="margin-top:25px;">✂️ Barberos</h3>
+            <div class="fila-botones">
+                <input type="text" id="nuevoBarbero" placeholder="Nombre del barbero" style="flex:1;">
+                <button class="btn-chico btn" onclick="agregarBarbero()">+ Agregar</button>
+            </div>
+            <div id="listaB" style="margin-top:15px;"></div>
 
-<h2>2. Elegí fecha y horario</h2>
+            <h3 style="margin-top:25px;">⏰ Horarios</h3>
+            <div class="fila-botones">
+                <input type="text" id="nuevoHorario" placeholder="Ej: 14:30" style="flex:1;">
+                <button class="btn-chico btn" onclick="agregarHorario()">+ Agregar</button>
+            </div>
+            <div id="listaH" style="margin-top:15px;"></div>
 
-<div class="row">
-
-<div>
-
-<label>Fecha</label>
-
-<input
-type="date"
-id="fecha"
-onchange="actualizarHorarios()">
-
-</div>
-
-<div>
-
-<label>Barbero</label>
-
-<select id="barbero" onchange="actualizarHorarios()">
-
-<option>Barbero 1</option>
-<option>Barbero 2</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div class="horarios" id="horarios"></div>
-
-</div>
-
-
-<div class="card">
-
-<h2>3. Tus datos</h2>
-
-<div class="row">
-
-<div>
-
-<label>Nombre</label>
-
-<input
-id="nombre"
-placeholder="Tu nombre">
-
-</div>
-
-<div>
-
-<label>WhatsApp</label>
-
-<input
-id="telefono"
-placeholder="299 123 4567">
+            <h3 style="margin-top:25px;">💇 Servicios</h3>
+            <div class="fila-botones">
+                <input type="text" id="nomServicio" placeholder="Nombre del servicio" style="flex:1;">
+                <input type="number" id="precioServicio" placeholder="Precio $" style="width:120px;">
+                <button class="btn-chico btn" onclick="agregarServicio()">+ Agregar</button>
+            </div>
+            <div id="listaS" style="margin-top:15px;"></div>
+        </div>
+    </div>
+</section>
 
 </div>
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>4. Confirmar turno</h2>
-
-<div class="resumen" id="resumen">
-
-Elegí servicio, fecha y horario.
-
-</div>
-
-<button
-class="confirmar"
-onclick="confirmar()">
-
-CONFIRMAR TURNO
-
-</button>
-
-<div
-class="error"
-id="error">
-</div>
-
-</div>
-
-</div>
-
-
-<div
-id="exito"
-class="card exito oculto">
-
-<div class="check">
-✓
-</div>
-
-<h2>¡Turno reservado!</h2>
-
-<p id="mensaje"></p>
-
-<button
-class="whatsapp"
-onclick="enviarWhatsApp()">
-
-📲 ENVIAR CONFIRMACIÓN POR WHATSAPP
-
-</button>
-
-</div>
-
-</div>
-
 
 <script>
-
-let turno={
-servicio:"",
-fecha:"",
-hora:"",
-barbero:"Barbero 1",
-nombre:"",
-telefono:""
-};
-
-const horarios=[
-"09:00",
-"09:30",
-"10:00",
-"10:30",
-"11:00",
-"11:30",
-"12:00",
-"16:00",
-"16:30",
-"17:00",
-"17:30",
-"18:00",
-"18:30",
-"19:00",
-"19:30",
-"20:00",
-"20:30"
+const DEF_CONFIG = { pass:'admin123', whatsapp:'' };
+const DEF_BARBEROS = ['Carlos','Martín','Juan'];
+const DEF_SERVICIOS = [
+    {nombre:'Corte de cabello', precio:5000},
+    {nombre:'Arreglo de barba', precio:3500},
+    {nombre:'Corte + Barba', precio:7500},
+    {nombre:'Afeitado clásico', precio:4000}
 ];
+const DEF_HORARIOS = ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 
+function cargarDatos(){
+    if(!localStorage.getItem('config')) localStorage.setItem('config', JSON.stringify(DEF_CONFIG));
+    if(!localStorage.getItem('barberos')) localStorage.setItem('barberos', JSON.stringify(DEF_BARBEROS));
+    if(!localStorage.getItem('servicios')) localStorage.setItem('servicios', JSON.stringify(DEF_SERVICIOS));
+    if(!localStorage.getItem('horarios')) localStorage.setItem('horarios', JSON.stringify(DEF_HORARIOS));
+}
+function db(){
+    return {
+        config:JSON.parse(localStorage.getItem('config')),
+        barberos:JSON.parse(localStorage.getItem('barberos')),
+        servicios:JSON.parse(localStorage.getItem('servicios')),
+        horarios:JSON.parse(localStorage.getItem('horarios'))
+    };
+}
+function guardar(clave, valor){ localStorage.setItem(clave, JSON.stringify(valor)); }
 
-function servicio(nombre,boton){
-
-turno.servicio=nombre;
-
-document
-.querySelectorAll(".service")
-.forEach(x=>x.classList.remove("selected"));
-
-boton.classList.add("selected");
-
-actualizarResumen();
-
+function mostrarSeccion(nombre){
+    document.querySelectorAll('section').forEach(s=>s.classList.add('oculto'));
+    document.getElementById(nombre).classList.remove('oculto');
+    document.querySelectorAll('.btn-nav').forEach(b=>b.classList.remove('activo'));
+    document.getElementById('btn'+nombre.charAt(0).toUpperCase()+nombre.slice(1)).classList.add('activo');
+    if(nombre==='reservar'){ cargarFormulario(); establecerFechaMinima(); }
 }
 
-
-function actualizarHorarios(){
-
-turno.fecha=document.getElementById("fecha").value;
-
-turno.barbero=document.getElementById("barbero").value;
-
-turno.hora="";
-
-let contenedor=document.getElementById("horarios");
-
-contenedor.innerHTML="";
-
-let reservas=
-JSON.parse(
-localStorage.getItem("mistic_turnos") || "[]"
-);
-
-horarios.forEach(hora=>{
-
-let ocupado=
-reservas.some(t=>
-t.fecha===turno.fecha &&
-t.hora===hora &&
-t.barbero===turno.barbero
-);
-
-let boton=document.createElement("button");
-
-boton.className="hora";
-
-boton.innerText=hora;
-
-if(ocupado){
-
-boton.classList.add("ocupado");
-
-boton.disabled=true;
-
-}else{
-
-boton.onclick=()=>{
-
-turno.hora=hora;
-
-document
-.querySelectorAll(".hora")
-.forEach(x=>x.classList.remove("selected"));
-
-boton.classList.add("selected");
-
-actualizarResumen();
-
-};
-
+function establecerFechaMinima(){
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('selFecha').min = hoy;
 }
 
-contenedor.appendChild(boton);
-
-});
-
-actualizarResumen();
-
+function ingresar(){
+    if(document.getElementById('passAdmin').value === db().config.pass){
+        document.getElementById('panelConfig').classList.remove('oculto');
+        document.getElementById('numWA').value = db().config.whatsapp;
+        listarBarberos(); listarServicios(); listarHorarios();
+    }else{ alert('❌ Contraseña incorrecta'); }
 }
 
-
-function actualizarResumen(){
-
-let resumen=document.getElementById("resumen");
-
-if(
-!turno.servicio ||
-!turno.fecha ||
-!turno.hora
-){
-
-resumen.innerText=
-"Elegí servicio, fecha y horario.";
-
-return;
-
+function guardarNumero(){
+    const num = document.getElementById('numWA').value.replace(/[^0-9]/g,'');
+    if(num.length < 10){ alert('⚠️ Número muy corto. Formato: 549 + código + número'); return; }
+    const c = db().config; c.whatsapp = num; guardar('config', c);
+    document.getElementById('guardadoOK').classList.remove('oculto');
+    setTimeout(()=>document.getElementById('guardadoOK').classList.add('oculto'), 2500);
 }
 
-let fecha=
-new Date(turno.fecha+"T12:00:00")
-.toLocaleDateString(
-"es-AR",
-{
-weekday:"long",
-day:"numeric",
-month:"long",
-year:"numeric"
-}
-);
+function cargarFormulario(){
+    const d = db();
+    const selB = document.getElementById('selBarbero');
+    const selS = document.getElementById('selServicio');
 
-resumen.innerHTML=
-"<strong>"+turno.servicio+"</strong><br>"+
-fecha+
-"<br>"+
-turno.hora+
-"<br>"+
-turno.barbero;
+    selB.innerHTML = '<option value="">— Elegí —</option>';
+    d.barberos.forEach(b=> selB.innerHTML += <option value="${b}">${b}</option>);
 
+    selS.innerHTML = '<option value="">— Elegí —</option>';
+    d.servicios.forEach(s=> selS.innerHTML += <option value="${s.nombre}">${s.nombre} — $${s.precio}</option>);
 }
 
+function cargarHorarios(){
+    const selH = document.getElementById('selHorario');
+    const fecha = document.getElementById('selFecha').value;
+    const barbero = document.getElementById('selBarbero').value;
+    selH.innerHTML = '<option value="">— Elegí —</option>';
+    if(!barbero || !fecha) return;
 
-function confirmar(){
-
-let nombre=
-document.getElementById("nombre").value.trim();
-
-let telefono=
-document.getElementById("telefono").value.trim();
-
-let error=
-document.getElementById("error");
-
-error.innerText="";
-
-if(
-!turno.servicio ||
-!turno.fecha ||
-!turno.hora ||
-!nombre ||
-!telefono
-){
-
-error.innerText=
-"Completá todos los datos.";
-
-return;
-
+    db().horarios.forEach(h=> selH.innerHTML += <option value="${h}">${h}</option>);
 }
 
-turno.nombre=nombre;
+function armarTurno(){
+    const barbero = document.getElementById('selBarbero').value;
+    const servicio = document.getElementById('selServicio').value;
+    const fecha = document.getElementById('selFecha').value;
+    const horario = document.getElementById('selHorario').value;
+    const nombre = document.getElementById('inpNombre').value.trim();
+    const tel = document.getElementById('inpTel').value.trim();
+    const numNegocio = db().config.whatsapp;
 
-turno.telefono=telefono;
+    if(!barbero||!servicio||!fecha||!horario||!nombre||!tel){
+        alert('⚠️ Completá TODOS los campos'); return;
+    }
+    if(!numNegocio){
+        alert('⚠️ Falta configurar tu WhatsApp. Andá a Configuración');
+        mostrarSeccion('admin'); return;
+    }
 
-let reservas=
-JSON.parse(
-localStorage.getItem("mistic_turnos") || "[]"
-);
+    const mensaje = `Hola! Quisiera reservar un turno en MÍSTICO:
 
-let ocupado=
-reservas.some(t=>
-t.fecha===turno.fecha &&
-t.hora===turno.hora &&
-t.barbero===turno.barbero
-);
+👤 Nombre: ${nombre}
+📞 Mi WhatsApp: ${tel}
+✂️ Barbero: ${barbero}
+💇 Servicio: ${servicio}
+📅 Fecha: ${fecha}
+⏰ Hora: ${horario}
 
-if(ocupado){
+¡Gracias!`;
 
-error.innerText=
-"Ese horario ya está ocupado.";
+    const enlace = https://wa.me/${numNegocio}?text=${encodeURIComponent(mensaje)};
 
-actualizarHorarios();
+    document.getElementById('formReserva').classList.add('oculto');
+    document.getElementById('seccionConfirmado').classList.remove('oculto');
 
-return;
+    document.getElementById('resNombre').textContent = nombre;
+    document.getElementById('resBarbero').textContent = barbero;
+    document.getElementById('resServicio').textContent = servicio;
+    document.getElementById('resFecha').textContent = fecha;
+    document.getElementById('resHora').textContent = horario;
 
+    document.getElementById('botonWA').href = enlace;
 }
 
-reservas.push(turno);
-
-localStorage.setItem(
-"mistic_turnos",
-JSON.stringify(reservas)
-);
-
-document
-.getElementById("formulario")
-.classList.add("oculto");
-
-document
-.getElementById("exito")
-.classList.remove("oculto");
-
-let fecha=
-new Date(turno.fecha+"T12:00:00")
-.toLocaleDateString(
-"es-AR",
-{
-weekday:"long",
-day:"numeric",
-month:"long",
-year:"numeric"
-}
-);
-
-document.getElementById("mensaje").innerText=
-turno.nombre+
-", tu turno quedó reservado para el "+
-fecha+
-" a las "+
-turno.hora+
-" con "+
-turno.barbero+
-".";
-
+function nuevoTurno(){
+    document.getElementById('formReserva').classList.remove('oculto');
+    document.getElementById('seccionConfirmado').classList.add('oculto');
+    document.getElementById('selBarbero').value='';
+    document.getElementById('selServicio').value='';
+    document.getElementById('selFecha').value='';
+    document.getElementById('selHorario').innerHTML='<option value="">— Elegí barbero y fecha —</option>';
+    document.getElementById('inpNombre').value='';
+    document.getElementById('inpTel').value='';
 }
 
-
-function enviarWhatsApp(){
-
-let mensaje=
-"Hola Mistic Barbería 👋%0A%0A"+
-"Quiero confirmar mi turno:%0A%0A"+
-"✂️ Servicio: "+
-turno.servicio+
-"%0A📅 Fecha: "+
-turno.fecha+
-"%0A🕐 Hora: "+
-turno.hora+
-"%0A💈 Barbero: "+
-turno.barbero+
-"%0A👤 Nombre: "+
-turno.nombre+
-"%0A📱 WhatsApp: "+
-turno.telefono;
-
-window.open(
-"https://wa.me/5492984548329?text="+mensaje,
-"_blank"
-);
-
+function agregarBarbero(){
+    const nom = document.getElementById('nuevoBarbero').value.trim();
+    if(!nom) return;
+    const b = db().barberos; b.push(nom); guardar('barberos', b);
+    document.getElementById('nuevoBarbero').value=''; listarBarberos(); cargarFormulario();
+}
+function listarBarberos(){
+    const cont = document.getElementById('listaB'); cont.innerHTML='';
+    db().barberos.forEach((b,i)=>{
+        cont.innerHTML += `<div style="padding:8px 0; border-bottom:1px solid rgba(212,175,55,0.15); display:flex; justify-content:space-between; align-items:center;">
+            <span>${b}</span>
+            <button style="background:#e74c3c; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="eliminarB(${i})">X</button>
+        </div>`;
+    });
+}
+function eliminarB(i){
+    const b = db().barberos; b.splice(i,1); guardar('barberos', b); listarBarberos(); cargarFormulario();
 }
 
+function agregarHorario(){
+    const h = document.getElementById('nuevoHorario').value.trim();
+    if(!h) return;
+    const lista = db().horarios; lista.push(h); guardar('horarios', lista);
+    document.getElementById('nuevoHorario').value=''; listarHorarios();
+}
+function listarHorarios(){
+    const cont = document.getElementById('listaH'); cont.innerHTML='';
+    db().horarios.forEach((h,i)=>{
+        cont.innerHTML += `<div style="padding:8px 0; border-bottom:1px solid rgba(212,175,55,0.15); display:flex; justify-content:space-between; align-items:center;">
+            <span>${h}</span>
+            <button style="background:#e74c3c; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="eliminarH(${i})">X</button>
+        </div>`;
+    });
+}
+function eliminarH(i){
+    const lista = db().horarios; lista.splice(i,1); guardar('horarios', lista); listarHorarios();
+}
 
-let hoy=
-new Date().toISOString().split("T")[0];
+function agregarServicio(){
+    const nom = document.getElementById('nomServicio').value.trim();
+    const pre = parseInt(document.getElementById('precioServicio').value);
+    if(!nom||!pre) return;
+    const s = db().servicios; s.push({nombre:nom, precio:pre}); guardar('servicios', s);
+    document.getElementById('nomServicio').value=''; document.getElementById('precioServicio').value=''; listarServicios(); cargarFormulario();
+}
+function listarServicios(){
+    const cont = document.getElementById('listaS'); cont.innerHTML='';
+    db().servicios.forEach((s,i)=>{
+        cont.innerHTML += `<div style="padding:8px 0; border-bottom:1px solid rgba(212,175,55,0.15); display:flex; justify-content:space-between; align-items:center;">
+            <span>${s.nombre} — $${s.precio}</span>
+            <button style="background:#e74c3c; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="eliminarS(${i})">X</button>
+        </div>`;
+    });
+}
+function eliminarS(i){
+    const s = db().servicios; s.splice(i,1); guardar('servicios', s); listarServicios(); cargarFormulario();
+}
 
-document.getElementById("fecha").min=hoy;
-
-document.getElementById("fecha").value=hoy;
-
-actualizarHorarios();
-
+cargarDatos();
 </script>
 
 </body>
 </html>
+
+
+
+
+
