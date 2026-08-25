@@ -9,33 +9,31 @@
         :root{--dorado:#d4af37; --azul-oscuro:#0a0f2b; --fondo:#0f1433; --gris:#1a1f45; --texto:#e0e0ff; --exito:#27ae60; --whatsapp:#25D366;}
         body{background:var(--azul-oscuro); color:var(--texto); min-height:100vh; line-height:1.5;}
 
-        /* CABECERA CON LOGO Y NOMBRE */
         .cabecera{text-align:center; padding:30px 20px 20px; background:linear-gradient(to bottom, rgba(10,15,43,1), rgba(15,20,51,0));}
         .logo{max-width:180px; max-height:180px; margin-bottom:15px; filter:drop-shadow(0 0 15px rgba(212,175,55,0.4));}
         .nombre-mistico{color:var(--dorado); font-size:38px; font-weight:bold; letter-spacing:6px; margin-bottom:5px; text-shadow:0 0 20px rgba(212,175,55,0.3);}
         .subtitulo{color:#9999cc; font-size:15px; letter-spacing:2px;}
 
-        .nav{background:rgba(10,15,43,0.9); padding:12px 20px; display:flex; justify-content:center; gap:12px; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(212,175,55,0.2); backdrop-filter:blur(10px);}
+        .nav{background:rgba(10,15,43,0.9); padding:12px 20px; display:flex; justify-content:center; gap:12px; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(212,175,55,0.2);}
         .btn-nav{background:transparent; color:#e0e0ff; border:1px solid var(--dorado); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; transition:all 0.3s;}
         .btn-nav.activo{background:var(--dorado); color:#000; font-weight:600;}
-        .btn-nav:hover{border-color:#e0c860;}
 
         .container{max-width:600px; margin:0 auto; padding:20px 15px;}
         .oculto{display:none !important;}
 
         .card{background:var(--gris); border-radius:12px; padding:24px; margin-bottom:20px; border:1px solid rgba(212,175,55,0.15); box-shadow:0 8px 32px rgba(0,0,0,0.4);}
-        h2{color:var(--dorado); margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.2); font-size:20px; letter-spacing:1px;}
+        h2{color:var(--dorado); margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid rgba(212,175,55,0.2); font-size:20px;}
 
         label{display:block; margin:14px 0 6px; color:#b0b0e0; font-size:14px; font-weight:500;}
         input, select, button{width:100%; padding:14px; border:none; border-radius:8px; font-size:16px;}
         input, select{background:var(--fondo); color:#fff; border:2px solid rgba(212,175,55,0.2); outline:none;}
         input:focus, select:focus{border-color:var(--dorado);}
 
-        .btn{background:var(--dorado); color:#000; font-weight:700; margin-top:12px; cursor:pointer; border:none; transition:all 0.3s;}
-        .btn:hover{background:#e0c860; transform:translateY(-1px);}
+        .btn{background:var(--dorado); color:#000; font-weight:700; margin-top:12px; cursor:pointer; border:none;}
+        .btn:hover{background:#e0c860;}
 
-        .btn-whatsapp{background:var(--whatsapp); color:#fff; font-size:18px; padding:18px; font-weight:bold; border-radius:10px; cursor:pointer; margin-top:20px; width:100%; border:none; box-shadow:0 4px 20px rgba(37,211,102,0.3); text-decoration:none; display:block; text-align:center; transition:all 0.3s;}
-        .btn-whatsapp:hover{background:#12b850; transform:translateY(-2px);}
+        .btn-whatsapp{background:var(--whatsapp); color:#fff; font-size:18px; padding:18px; font-weight:bold; border-radius:10px; cursor:pointer; margin-top:20px; width:100%; border:none; box-shadow:0 4px 20px rgba(37,211,102,0.3); text-decoration:none; display:block; text-align:center;}
+        .btn-whatsapp:hover{background:#12b850;}
 
         .resumen-turno{background:var(--fondo); border-radius:8px; padding:18px; margin:15px 0; line-height:2.2; font-size:15px; border-left:3px solid var(--dorado);}
         .resumen-turno strong{color:var(--dorado);}
@@ -50,9 +48,8 @@
 </head>
 <body>
 
-<!-- CABECERA CON LOGO Y NOMBRE -->
 <div class="cabecera">
-    <img src="https://i.imgur.com/8ZxXQfL.png" alt="Logo Místico" class="logo">
+    <img src="https://i.imgur.com/8ZxXQfL.png" alt="Logo Místico" class="logo" onerror="this.style.display='none'">
     <h1 class="nombre-mistico">MÍSTICO</h1>
     <p class="subtitulo">Reserva tu turno</p>
 </div>
@@ -172,20 +169,32 @@ const DEF_SERVICIOS = [
 const DEF_HORARIOS = ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 
 function cargarDatos(){
-    if(!localStorage.getItem('config')) localStorage.setItem('config', JSON.stringify(DEF_CONFIG));
-    if(!localStorage.getItem('barberos')) localStorage.setItem('barberos', JSON.stringify(DEF_BARBEROS));
-    if(!localStorage.getItem('servicios')) localStorage.setItem('servicios', JSON.stringify(DEF_SERVICIOS));
-    if(!localStorage.getItem('horarios')) localStorage.setItem('horarios', JSON.stringify(DEF_HORARIOS));
+    try {
+        if(!localStorage.getItem('config')) localStorage.setItem('config', JSON.stringify(DEF_CONFIG));
+        if(!localStorage.getItem('barberos')) localStorage.setItem('barberos', JSON.stringify(DEF_BARBEROS));
+        if(!localStorage.getItem('servicios')) localStorage.setItem('servicios', JSON.stringify(DEF_SERVICIOS));
+        if(!localStorage.getItem('horarios')) localStorage.setItem('horarios', JSON.stringify(DEF_HORARIOS));
+    } catch(e) {
+        console.log('Error guardando datos:', e);
+    }
 }
 function db(){
-    return {
-        config:JSON.parse(localStorage.getItem('config')),
-        barberos:JSON.parse(localStorage.getItem('barberos')),
-        servicios:JSON.parse(localStorage.getItem('servicios')),
-        horarios:JSON.parse(localStorage.getItem('horarios'))
-    };
+    try {
+        return {
+            config:JSON.parse(localStorage.getItem('config') || JSON.stringify(DEF_CONFIG)),
+            barberos:JSON.parse(localStorage.getItem('barberos') || JSON.stringify(DEF_BARBEROS)),
+            servicios:JSON.parse(localStorage.getItem('servicios') || JSON.stringify(DEF_SERVICIOS)),
+            horarios:JSON.parse(localStorage.getItem('horarios') || JSON.stringify(DEF_HORARIOS))
+        };
+    } catch(e) {
+        return { config:DEF_CONFIG, barberos:DEF_BARBEROS, servicios:DEF_SERVICIOS, horarios:DEF_HORARIOS };
+    }
 }
-function guardar(clave, valor){ localStorage.setItem(clave, JSON.stringify(valor)); }
+function guardar(clave, valor){ 
+    try {
+        localStorage.setItem(clave, JSON.stringify(valor)); 
+    } catch(e) {}
+}
 
 function mostrarSeccion(nombre){
     document.querySelectorAll('section').forEach(s=>s.classList.add('oculto'));
