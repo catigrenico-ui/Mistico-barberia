@@ -18,7 +18,8 @@
         input:focus, select:focus{border-color:#d4af37;}
         .btn{padding:14px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;}
         .btn-amarillo{background:#d4af37; color:#000; margin-top:15px; width:100%;}
-        .btn-verde{background:#25D366; color:#fff; margin-top:15px; width:100%; text-decoration:none; display:block; text-align:center; padding:14px; border-radius:8px; font-weight:bold;}
+        .btn-verde{background:#25D366; color:#fff; margin-top:15px; width:100%; text-decoration:none; display:block; text-align:center; padding:14px; border-radius:8px; font-weight:bold; font-size:16px;}
+        .btn-copiar{background:#4CAF50; color:#fff; margin-top:15px; width:100%;}
         .btn-rojo{background:#e74c3c; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
         .btn-chico-ok{background:#27ae60; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
         .btn-chico-gris{background:#555; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
@@ -33,9 +34,11 @@
         .btn-admin-pequeño{position:fixed; top:15px; right:15px; background:transparent; border:none; color:#555; font-size:22px; cursor:pointer; z-index:100;}
         .pass-box{max-width:340px; margin:0 auto; text-align:center;}
         .resumen{background:#0f1433; padding:18px; border-radius:10px; margin:15px 0; line-height:2.2;}
+        .mensaje-caja{background:#0f1433; padding:15px; border-radius:8px; margin:15px 0; border:2px solid #25D366; white-space:pre-wrap; font-size:14px; line-height:1.8; color:#d0ffd0; user-select:text;}
         .exito{color:#2ecc71; font-size:20px; font-weight:bold; text-align:center; margin:15px 0;}
         .oculto{display:none !important;}
         .ayuda{color:#888; font-size:12px; margin-top:4px;}
+        .paso{background:rgba(37,211,102,0.1); padding:10px; border-radius:6px; margin:8px 0; font-size:14px;}
     </style>
 </head>
 <body>
@@ -108,8 +111,34 @@
                 <strong>Fecha:</strong> <span id="rFecha"></span><br>
                 <strong>Hora:</strong> <span id="rHora"></span>
             </div>
-            <a id="botonWA" class="btn-verde" href="" target="_blank" rel="noopener">💬 ENVIAR POR WHATSAPP</a>
-            <button class="btn btn-amarillo" style="background:#444; color:#fff;" onclick="volver()">🔄 Volver</button>
+
+            <div class="paso">
+                <strong>PASO 1:</strong> Seleccioná y copiá el mensaje de abajo 👇
+            </div>
+            <div class="mensaje-caja" id="cajaMensaje" onclick="seleccionarTodo()">
+                Hola! Quisiera reservar un turno en MÍSTICO:
+
+👤 Nombre: <span id="mNombre"></span>
+📞 Mi WhatsApp: <span id="mTel"></span>
+✂️ Barbero: <span id="mBarbero"></span>
+💇 Servicio: <span id="mServicio"></span>
+📅 Fecha: <span id="mFecha"></span>
+⏰ Hora: <span id="mHora"></span>
+
+¡Gracias!
+            </div>
+
+            <div class="paso">
+                <strong>PASO 2:</strong> Abrí WhatsApp y buscá el número: <strong>5492984548329</strong>
+            </div>
+
+            <div class="paso">
+                <strong>PASO 3:</strong> Pegá el mensaje y enviá ✅
+            </div>
+
+            <a class="btn-verde" href="https://wa.me/5492984548329" target="_blank">💬 IR A WHATSAPP</a>
+
+            <button class="btn btn-amarillo" style="background:#444; color:#fff; margin-top:15px;" onclick="volver()">🔄 Volver</button>
         </div>
     </div>
 </div>
@@ -140,7 +169,7 @@
 
 <script>
 const CONTRASEÑA = 'admin123';
-const TU_WHATSAPP = '5492984548329'; // Tu número SIN espacios ni símbolos
+const TU_WHATSAPP = '5492984548329';
 const HORARIOS_FIJOS = ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 let filtroActual = 'todos';
 
@@ -211,9 +240,18 @@ async function cargarHorariosDisponibles(){
     }
 }
 
-function limpiarNumero(numero){
-    // Deja SOLO números, quita +, espacios, guiones, paréntesis
-    return numero.replace(/\D/g, '');
+function seleccionarTodo(){
+    const caja = document.getElementById('cajaMensaje');
+    if (document.selection) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(caja);
+        range.select();
+    } else if (window.getSelection) {
+        const range = document.createRange();
+        range.selectNodeContents(caja);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
 }
 
 async function generarTurno(){
@@ -237,21 +275,6 @@ async function generarTurno(){
 
     await refTurnos.push({ barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false });
 
-    const mensaje = `Hola! Quisiera reservar un turno en MÍSTICO:
-
-👤 Nombre: ${nombre}
-📞 Mi WhatsApp: ${tel}
-✂️ Barbero: ${barbero}
-💇 Servicio: ${servicio}
-📅 Fecha: ${fecha}
-⏰ Hora: ${hora}
-
-¡Gracias!`;
-
-    // LIMPIA EL NÚMERO PARA QUE WHATSAPP LO RECONOZCA BIEN
-    const numeroLimpio = limpiarNumero(TU_WHATSAPP);
-    const enlaceWA = `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
-
     document.getElementById('formRes').classList.add('oculto');
     document.getElementById('confirmado').classList.remove('oculto');
     document.getElementById('rNombre').textContent = nombre;
@@ -259,9 +282,12 @@ async function generarTurno(){
     document.getElementById('rServicio').textContent = servicio;
     document.getElementById('rFecha').textContent = fecha;
     document.getElementById('rHora').textContent = hora;
-    document.getElementById('botonWA').href = enlaceWA;
-    
-    console.log('Enlace WhatsApp:', enlaceWA); // Para ver en consola si hay error
+    document.getElementById('mNombre').textContent = nombre;
+    document.getElementById('mTel').textContent = tel;
+    document.getElementById('mBarbero').textContent = barbero;
+    document.getElementById('mServicio').textContent = servicio;
+    document.getElementById('mFecha').textContent = fecha;
+    document.getElementById('mHora').textContent = hora;
 }
 
 function volver(){
@@ -326,5 +352,5 @@ document.getElementById('selFecha').min = new Date().toISOString().split('T')[0]
 </script>
 
 </body>
-    </html>
+                </html>
     
