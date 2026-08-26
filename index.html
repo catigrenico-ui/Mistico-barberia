@@ -448,7 +448,9 @@ refConfig.on('value', snap => {
 });
 
 refTurnos.on('value', () => {
+  // ✅ SOLO cargar horarios si estamos EN la página de reservas
   if(paginaActual === 'reservar') cargarHorariosDisponibles();
+  // ✅ SOLO listar turnos si estamos en admin y ya ingresamos
   if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')) listarTurnos();
 });
 
@@ -461,4 +463,317 @@ function actualizarSelectores(){
   selS.innerHTML = '<option value="">— Seleccionar —</option>';
   
   config.barberos.forEach(b => selB.innerHTML += `<option value="${b}">${b}</option>`);
-  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s
+  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
+}
+
+function irA(pagina){
+  paginaActual = pagina;
+  document.getElementById('reservar').classList.add('oculto');
+  document.getElementById('admin').classList.add('oculto');
+  document.getElementById(pagina).classList.remove('oculto');
+  
+  if(pagina==='reservar'){
+    document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
+    actualizarSelectores();
+  }
+  if(pagina==='admin'){
+    document.getElementById('cajaPass').classList.remove('oculto');
+    document.getElementById('panelConfig').classList.add('oculto');
+  }
+}
+
+function ingresar(){
+  if(document.getElementById('passAdmin').value === config.contrasena){
+    document.getElementById('cajaPass').classList.add('oculto');
+    document.getElementById('panelConfig').classList.remove('oculto');
+    cambiarTab('turnos');
+    listarTurnos();
+    listarBarberos();
+    listarServicios();
+    cargarAjustesEnFormulario();
+  }else{
+    alert('❌ Contraseña incorrecta');
+  }
+}
+
+function cambiarTab(nombre){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
+  event.target.classList.add('activo');
+  ['turnos','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
+  document.getElementById('tab-'+nombre).classList.remove('oculto');
+  if(nombre === 'ajustes') cargarAjustesEnFormulario();
+}
+
+function generarHorarios(){
+  const horarios = [];
+  
+  let [hIM, mIM] = config.horaInicioManana.split(':').map(Number);
+  let [hFM, mFM] = config.horaFinManana.split(':').map(Number);
+  let actualMañana = hIM * 60 + mIM;
+  const finMañana = hFM * 60 + mFM;
+  
+  while(actualMañana <= finMañana){
+    const hh = Math.floor(actualMañana / 60);
+    const mm = (actualMañana % 60).toString().padStart(2,'0');
+    horarios.push(`${hh}:${mm}`);
+    actualMañana += config.intervalo;
+  }
+  
+  let [hIT, mIT] = config.horaInicioTarde.split(':').map(Number);
+  let [hFT, mFT] = config.horaFinTarde.split(':').map(Number);
+  let actualTarde = hIT * 60 + mIT;
+  const finTarde = hFT * 60 + mFT;
+  
+  while(actualTarde <= finTarde){
+    const hh = Math.floor(actualTarde / 60);
+    const mm = (actualTarde % 60).toString().padStart(2,'0');
+    horarios.push(`${hh}:${mm}`);
+    actualTarde += config.intervalo;
+  }
+  
+  return horarios;
+}
+
+async function cargarHorariosDisponibles(){
+  // ✅ Si NO estamos en la página de reservas, NO hacemos nada
+  if(paginaActual !== 'reservar') return;
+
+  const barbero = document.getElementById('selBarbero').value;
+  const fecha = document.getElementById('selFecha').value;
+  const selH = document.getElementById('selHora');
+  const aviso = document.getElementById('avisoHorario');
+  
+  selH.innerHTML = '<option value="">— Elegí horario —</option>';
+  aviso.classList.add('oculto');
+  
+  if(!barbero || !fecha) return;
+
+  aviso.classList.remove('oculto');
+  aviso.textContent = '⏳ Cargando horarios...';
+
+  try {
+    const snap = await refTurnos.once('value');
+    const todosTurnos = snap.val() || {};
+    const ocupados = Object.values(todosTurnos)
+      .filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha)
+      .map(t => t.hora);
+
+    const HORARIOS = generarHorarios();
+    let hayDisponibles = false;
+    HORARIOS.forEach(hora => {
+      if(!ocupados.includes(hora)){
+        selH.innerHTML += `<option value="${hora}">${hora}</option>`;
+        hayDisponibles = true;
+      }
+    });
+
+    if(!hayDisponibles) selH.innerHTML = '<option value="">❌ No hay horarios disponibles ese día</option>';
+    aviso.textContent = hayDisponibles ? '✅ Horarios cargados' : '⚠️ No hay turnos libres ese día';
+    setTimeout(() => aviso.classList.add('oculto'), 2500);
+  } catch (error) {
+    aviso.textContent = '❌ Sin conexión. Probá más tarde.';
+    aviso.classList.add('error');
+  }
+}
+
+async function generarTurno(){
+  const nombre = document.getElementById('inpNombre').value.trim();
+  const barbero = document.getElementById('selBarbero').value;
+  const servicio = document.getElementById('selServicio').value;
+  const fecha = document.getElementById('selFecha').value;
+  const hora = document.getElementById('selHora').value;
+  const tel = document.getElementById('inpTel').value.trim();
+
+  if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){
+    alert('⚠️ Completá todos los campos'); return;
+  }
+  if(hora.includes('❌') || hora === ''){
+    alert('⚠️ Elegí un horario válido'); return;
+  }
+
+  const snap = await refTurnos.once('value');
+  const todosTurnos = snap.val() || {};
+  const yaOcupado = Object.values(todosTurnos).some(t => !t.atendido && t.barbero === barbero && t.fecha === fecha && t.hora === hora);
+  
+  if(yaOcupado){
+    alert('❌ ¡Ese horario acaba de ser reservado! Elegí otro.');
+    cargarHorariosDisponibles();
+    return;
+  }
+
+  await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false});
+
+  const mensaje = `Hola! Quisiera reservar un turno en MÍSTICO:
+
+👤 Nombre: ${nombre}
+📞 Mi WhatsApp: ${tel}
+✂️ Barbero: ${barbero}
+💇 Servicio: ${servicio}
+📅 Fecha: ${fecha}
+⏰ Hora: ${hora}
+
+¡Gracias!`;
+
+  const enlace = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
+
+  document.getElementById('formRes').classList.add('oculto');
+  document.getElementById('confirmado').classList.remove('oculto');
+  document.getElementById('rNombre').textContent = nombre;
+  document.getElementById('rBarbero').textContent = barbero;
+  document.getElementById('rServicio').textContent = servicio;
+  document.getElementById('rFecha').textContent = fecha;
+  document.getElementById('rHora').textContent = hora;
+  document.getElementById('botonWA').href = enlace;
+  document.getElementById('cajaMensaje').textContent = mensaje;
+}
+
+function volver(){
+  document.getElementById('formRes').classList.remove('oculto');
+  document.getElementById('confirmado').classList.add('oculto');
+  document.getElementById('inpNombre').value='';
+  document.getElementById('selBarbero').value='';
+  document.getElementById('selServicio').value='';
+  document.getElementById('selFecha').value='';
+  document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
+  document.getElementById('inpTel').value='';
+}
+
+function cambiarFiltro(filtro){
+  filtroActual = filtro;
+  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
+  event.target.classList.add('activo');
+  listarTurnos();
+}
+
+async function listarTurnos(){
+  const c = document.getElementById('listaTurnos'); c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">Cargando turnos...</p>';
+  
+  try {
+    const snap = await refTurnos.once('value');
+    const datos = snap.val() || {};
+    let turnos = Object.entries(datos).map(([id, t]) => ({...t, id}));
+    
+    if(turnos.length === 0){
+      c.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:30px;">No hay turnos registrados</p>';
+      return;
+    }
+
+    turnos = turnos.sort((a,b)=> new Date(b.fecha+'T'+b.hora) - new Date(a.fecha+'T'+a.hora));
+    if(filtroActual === 'pendientes') turnos = turnos.filter(t=>!t.atendido);
+    if(filtroActual === 'atendidos') turnos = turnos.filter(t=>t.atendido);
+
+    c.innerHTML = '';
+    turnos.forEach(t=>{
+      c.innerHTML += `
+        <div class="item ${t.atendido?'atendido':''}">
+            <div style="flex:1; min-width:200px;">
+                <strong style="color:var(--texto); font-size:15px;">${t.nombre}</strong>
+                ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}
+                <br><small style="color:var(--textoSec);">${t.barbero} · ${t.servicio}</small>
+                <br><small style="color:var(--doradoClaro);">📅 ${t.fecha} ⏰ ${t.hora}</small>
+            </div>
+            <div class="fila">
+                ${!t.atendido
+                    ?`<button class="btn btn-verde" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`
+                    :`<button class="btn btn-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`
+                }
+                <button class="btn btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button>
+            </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    c.innerHTML = '<p style="color:var(--alerta); text-align:center; padding:30px;">❌ Error cargando turnos</p>';
+  }
+}
+
+async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
+async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); }
+async function borrarTurno(id){ if(!confirm('¿Eliminar este turno definitivamente?')) return; await refTurnos.child(id).remove(); }
+
+async function agregarBarbero(){
+  const nom = document.getElementById('nuevoBarbero').value.trim();
+  if(!nom || config.barberos.includes(nom)) return;
+  config.barberos.push(nom);
+  await refConfig.update({barberos: config.barberos});
+  document.getElementById('nuevoBarbero').value='';
+  document.getElementById('guardadoBarbero').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoBarbero').style.display='none',3000);
+  listarBarberos();
+}
+
+async function eliminarBarbero(nom){
+  if(!confirm(`¿Eliminar a "${nom}"? No afecta los turnos ya reservados`)) return;
+  config.barberos = config.barberos.filter(b=>b!==nom);
+  await refConfig.update({barberos: config.barberos});
+  listarBarberos();
+}
+
+function listarBarberos(){
+  const c = document.getElementById('listaBarberos'); c.innerHTML='';
+  config.barberos.forEach(b=>{
+    c.innerHTML += `<div class="item item-chiquito"><span>${b}</span><button class="btn btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`;
+  });
+}
+
+async function agregarServicio(){
+  const nom = document.getElementById('nuevoServicio').value.trim();
+  const pre = parseInt(document.getElementById('precioServicio').value);
+  if(!nom || !pre) return;
+  config.servicios.push({nombre:nom, precio:pre});
+  await refConfig.update({servicios: config.servicios});
+  document.getElementById('nuevoServicio').value='';
+  document.getElementById('precioServicio').value='';
+  document.getElementById('guardadoServicio').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoServicio').style.display='none',3000);
+  listarServicios();
+}
+
+async function eliminarServicio(indice){
+  if(!confirm('¿Eliminar este servicio? No afecta los turnos ya reservados')) return;
+  config.servicios.splice(indice,1);
+  await refConfig.update({servicios: config.servicios});
+  listarServicios();
+}
+
+function listarServicios(){
+  const c = document.getElementById('listaServicios'); c.innerHTML='';
+  config.servicios.forEach((s,i)=>{
+    c.innerHTML += `<div class="item item-chiquito"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`;
+  });
+}
+
+function cargarAjustesEnFormulario(){
+  document.getElementById('horaInicioManana').value = config.horaInicioManana;
+  document.getElementById('horaFinManana').value = config.horaFinManana;
+  document.getElementById('horaInicioTarde').value = config.horaInicioTarde;
+  document.getElementById('horaFinTarde').value = config.horaFinTarde;
+  document.getElementById('intervaloMin').value = config.intervalo;
+  document.getElementById('waBarberia').value = config.whatsapp;
+  document.getElementById('nuevaPass').value = '';
+}
+
+async function guardarAjustes(){
+  const nuevos = {
+    horaInicioManana: document.getElementById('horaInicioManana').value,
+    horaFinManana: document.getElementById('horaFinManana').value,
+    horaInicioTarde: document.getElementById('horaInicioTarde').value,
+    horaFinTarde: document.getElementById('horaFinTarde').value,
+    intervalo: parseInt(document.getElementById('intervaloMin').value),
+    whatsapp: document.getElementById('waBarberia').value.trim()
+  };
+  const nuevaPass = document.getElementById('nuevaPass').value.trim();
+  if(nuevaPass) nuevos.contrasena = nuevaPass;
+  
+  await refConfig.update(nuevos);
+  document.getElementById('guardadoAjustes').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoAjustes').style.display='none',3000);
+  if(nuevaPass) alert('✅ Contraseña actualizada correctamente');
+  config = {...config, ...nuevos};
+}
+
+document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
+</script>
+
+</body>
+</html>
