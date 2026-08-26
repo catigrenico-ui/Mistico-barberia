@@ -18,7 +18,7 @@
         input:focus, select:focus{border-color:#d4af37;}
         .btn{padding:14px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;}
         .btn-amarillo{background:#d4af37; color:#000; margin-top:15px; width:100%;}
-        .btn-verde{background:#25D366; color:#fff; margin-top:15px; width:100%; text-decoration:none; display:block; text-align:center;}
+        .btn-verde{background:#25D366; color:#fff; margin-top:15px; width:100%; text-decoration:none; display:block; text-align:center; padding:14px; border-radius:8px; font-weight:bold;}
         .btn-rojo{background:#e74c3c; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
         .btn-chico-ok{background:#27ae60; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
         .btn-chico-gris{background:#555; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:6px;}
@@ -73,7 +73,7 @@
 
             <label>⏰ Horario Disponible *</label>
             <select id="selHora">
-                <option value="">— Primero elegí barbero y fecha —</option>
+                <option value="">— Elegí barbero y fecha primero —</option>
                 <option value="09:00">09:00</option>
                 <option value="09:30">09:30</option>
                 <option value="10:00">10:00</option>
@@ -88,13 +88,13 @@
                 <option value="17:30">17:30</option>
                 <option value="18:00">18:00</option>
             </select>
-            <p class="ayuda">Los horarios ocupados se desactivan automáticamente</p>
+            <p class="ayuda">Los horarios ocupados se desactivan solos</p>
 
             <label>👤 Tu Nombre Completo *</label>
             <input type="text" id="inpNombre" placeholder="Ej: Juan Pérez">
 
             <label>📱 Tu WhatsApp / Teléfono *</label>
-            <input type="tel" id="inpTel" placeholder="+54 9 294 ...">
+            <input type="tel" id="inpTel" placeholder="Ej: +54 9 298 454-8329">
 
             <button class="btn btn-amarillo" onclick="generarTurno()">✅ ARMAR TURNO</button>
         </div>
@@ -108,7 +108,7 @@
                 <strong>Fecha:</strong> <span id="rFecha"></span><br>
                 <strong>Hora:</strong> <span id="rHora"></span>
             </div>
-            <a id="botonWA" class="btn btn-verde" href="" target="_blank">💬 ENVIAR POR WHATSAPP</a>
+            <a id="botonWA" class="btn-verde" href="" target="_blank" rel="noopener">💬 ENVIAR POR WHATSAPP</a>
             <button class="btn btn-amarillo" style="background:#444; color:#fff;" onclick="volver()">🔄 Volver</button>
         </div>
     </div>
@@ -118,8 +118,8 @@
     <div class="caja pass-box" id="cajaPass">
         <h2 style="text-align:center; border:none;">🔒 Panel de Control</h2>
         <input type="password" id="passAdmin" placeholder="Contraseña">
-        <button class="btn btn-amarillo" onclick="ingresar()">Entrar</button>
-        <button class="btn btn-chico-gris" style="margin-top:15px; width:auto;" onclick="irA('reservar')">← Volver</button>
+        <button class="btn-amarillo" onclick="ingresar()">Entrar</button>
+        <button class="btn-chico-gris" style="margin-top:15px; width:auto;" onclick="irA('reservar')">← Volver</button>
     </div>
     <div id="panelConfig" class="oculto">
         <div class="caja">
@@ -131,7 +131,7 @@
             </div>
             <div class="lista" id="listaTurnos"></div>
         </div>
-        <button class="btn btn-chico-gris" style="margin-top:15px; width:auto;" onclick="irA('reservar')">← Volver a la página principal</button>
+        <button class="btn-chico-gris" style="margin-top:15px; width:auto;" onclick="irA('reservar')">← Volver a la página principal</button>
     </div>
 </div>
 
@@ -140,7 +140,7 @@
 
 <script>
 const CONTRASEÑA = 'admin123';
-const TU_WHATSAPP = '5492984548329';
+const TU_WHATSAPP = '5492984548329'; // Tu número SIN espacios ni símbolos
 const HORARIOS_FIJOS = ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
 let filtroActual = 'todos';
 
@@ -190,6 +190,7 @@ async function cargarHorariosDisponibles(){
     if(!barbero || !fecha) {
         for(let i=0; i<selH.options.length; i++){
             selH.options[i].disabled = false;
+            selH.options[i].style.color = '';
         }
         return;
     }
@@ -202,12 +203,17 @@ async function cargarHorariosDisponibles(){
         if(!hora) continue;
         const ocupado = turnos.some(t => t.barbero === barbero && t.fecha === fecha && t.hora === hora);
         selH.options[i].disabled = ocupado;
-        selH.options[i].style.color = ocupado ? '#883333' : '#fff';
+        selH.options[i].style.color = ocupado ? '#e74c3c' : '';
     }
     
     if(selH.value && selH.querySelector(`option[value="${selH.value}"]`)?.disabled){
         selH.value = '';
     }
+}
+
+function limpiarNumero(numero){
+    // Deja SOLO números, quita +, espacios, guiones, paréntesis
+    return numero.replace(/\D/g, '');
 }
 
 async function generarTurno(){
@@ -242,6 +248,10 @@ async function generarTurno(){
 
 ¡Gracias!`;
 
+    // LIMPIA EL NÚMERO PARA QUE WHATSAPP LO RECONOZCA BIEN
+    const numeroLimpio = limpiarNumero(TU_WHATSAPP);
+    const enlaceWA = `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+
     document.getElementById('formRes').classList.add('oculto');
     document.getElementById('confirmado').classList.remove('oculto');
     document.getElementById('rNombre').textContent = nombre;
@@ -249,7 +259,9 @@ async function generarTurno(){
     document.getElementById('rServicio').textContent = servicio;
     document.getElementById('rFecha').textContent = fecha;
     document.getElementById('rHora').textContent = hora;
-    document.getElementById('botonWA').href = `https://wa.me/${TU_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+    document.getElementById('botonWA').href = enlaceWA;
+    
+    console.log('Enlace WhatsApp:', enlaceWA); // Para ver en consola si hay error
 }
 
 function volver(){
@@ -314,5 +326,5 @@ document.getElementById('selFecha').min = new Date().toISOString().split('T')[0]
 </script>
 
 </body>
-</html>
-
+    </html>
+    
