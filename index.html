@@ -9,6 +9,7 @@
         :root{
             --fondo: #050714; --fondoSec: #0F1229; --fondoTarjeta: #141835;
             --dorado: #D4AF37; --doradoClaro: #F0D78C; --exito: #22C55E; --alerta: #EF4444;
+            --whatsapp: #25D366;
             --texto: #E8E8F0; --textoSec: #9CA0C2; --borde: rgba(212,175,55,0.2);
         }
         body{background:var(--fondo); color:var(--texto); min-height:100vh; padding:20px 16px; max-width:500px; margin:0 auto;}
@@ -23,8 +24,9 @@
         input, select, button{width:100%; padding:12px 14px; border:none; border-radius:8px; font-size:15px;}
         input, select{background:var(--fondoSec); color:var(--texto); border:2px solid transparent;}
         input:focus, select:focus{border-color:var(--dorado); outline:none;}
-        .btn{padding:12px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px;}
+        .btn{padding:12px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px; text-decoration:none; display:inline-block; text-align:center;}
         .btn-dorado{background:linear-gradient(135deg,var(--doradoClaro),var(--dorado)); color:#000; margin-top:20px;}
+        .btn-whatsapp{background:var(--whatsapp); color:#fff; margin-top:12px; display:flex; align-items:center; justify-content:center; gap:8px;}
         .btn-rojo{background:var(--alerta); color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
         .btn-verde{background:var(--exito); color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
         .btn-gris{background:#3F425F; color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
@@ -107,8 +109,10 @@
                 <strong>Barbero:</strong> <span id="rBarbero"></span><br>
                 <strong>Servicio:</strong> <span id="rServicio"></span><br>
                 <strong>Fecha:</strong> <span id="rFecha"></span><br>
-                <strong>Hora:</strong> <span id="rHora"></span>
+                <strong>Hora:</strong> <span id="rHora"></span><br>
+                <strong>Precio:</strong> <span id="rPrecio"></span>
             </div>
+            <a id="btnWa" class="btn btn-whatsapp" target="_blank">💬 ENVIAR POR WHATSAPP</a>
             <button class="btn btn-gris" style="width:100%; margin-top:16px;" onclick="volver()">🔄 Reservar otro</button>
         </div>
     </div>
@@ -155,7 +159,7 @@
                 </div>
                 <div class="balance-final"><strong>Saldo Actual</strong><div class="monto-total" id="saldoTotal">$0</div></div>
                 <div class="divisor"></div>
-                <h3>➕ Agregar Movimiento</h3>
+                <h3>➕ Agregar Movimiento Manual</h3>
                 <label>Tipo</label>
                 <select id="tipoMov">
                     <option value="ingreso">🟢 Ingreso</option>
@@ -210,7 +214,7 @@
         <div id="tab-ajustes" class="oculto">
             <div class="caja">
                 <h3>⚙️ Configuración</h3>
-                <label>WhatsApp de la Barbería</label>
+                <label>WhatsApp de la Barbería (sin espacios ni símbolos)</label>
                 <input type="tel" id="waBarberia" value="5492984548329">
                 <label>Contraseña de Admin</label>
                 <input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
@@ -241,7 +245,7 @@ const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
 const refMovimientos = db.ref('movimientos');
 
-// DATOS POR DEFECTO — CARGA INMEDIATA
+// DATOS POR DEFECTO
 let config = {
   contrasena: 'admin123',
   whatsapp: '5492984548329',
@@ -256,13 +260,12 @@ let config = {
 
 let filtroActual = 'todos', filtroMovActual = 'todos', paginaActual = 'reservar';
 
-// CARGA CONFIGURACIÓN DESDE FIREBASE
+// CARGA CONFIGURACIÓN
 refConfig.on('value', snap => {
   if(snap.exists()) config = {...config, ...snap.val()};
   actualizarSelectores();
 });
 
-// INICIO INMEDIATO
 actualizarSelectores();
 
 // NAVEGACIÓN
@@ -281,7 +284,6 @@ function irA(pagina){
   }
 }
 
-// INGRESAR A ADMIN
 function ingresar(){
   if(document.getElementById('passAdmin').value === config.contrasena){
     document.getElementById('cajaPass').classList.add('oculto');
@@ -292,7 +294,6 @@ function ingresar(){
   }else{ alert('❌ Contraseña incorrecta'); }
 }
 
-// ACTUALIZAR SELECTORES DE BARBEROS Y SERVICIOS
 function actualizarSelectores(){
   const selB = document.getElementById('selBarbero');
   const selS = document.getElementById('selServicio');
@@ -300,10 +301,9 @@ function actualizarSelectores(){
   selB.innerHTML = '<option value="">— Seleccionar barbero —</option>';
   selS.innerHTML = '<option value="">— Seleccionar servicio —</option>';
   config.barberos.forEach(b => selB.innerHTML += `<option value="${b}">${b}</option>`);
-  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
+  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre}||${s.precio}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
 }
 
-// CAMBIAR PESTAÑAS
 function cambiarTab(nombre){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
   event.target.classList.add('activo');
@@ -312,7 +312,6 @@ function cambiarTab(nombre){
   if(nombre === 'finanzas'){ calcularTotales(); listarMovimientos(); document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0]; }
 }
 
-// CARGAR HORARIOS
 async function cargarHorarios(){
   const barbero = document.getElementById('selBarbero').value;
   const fecha = document.getElementById('selFecha').value;
@@ -334,12 +333,13 @@ async function cargarHorarios(){
   }
 }
 
-// CONFIRMAR TURNO
+// === CONFIRMAR TURNO + INGRESO AUTOMÁTICO ===
 async function confirmarTurno(){
   const nombre = document.getElementById('inpNombre').value.trim();
   const barbero = document.getElementById('selBarbero').value;
-  const servicioCompleto = document.getElementById('selServicio').value;
-  const servicio = servicioCompleto.split(' — $')[0];
+  const selServicioValor = document.getElementById('selServicio').value;
+  if(!selServicioValor){ alert('⚠️ Elegí un servicio'); return; }
+  const [servicio, precio] = selServicioValor.split('||');
   const fecha = document.getElementById('selFecha').value;
   const hora = document.getElementById('selHora').value;
   const tel = document.getElementById('inpTel').value.trim();
@@ -347,8 +347,18 @@ async function confirmarTurno(){
   if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){ alert('⚠️ Completá todos los campos'); return; }
   if(hora.includes('❌') || hora === ''){ alert('⚠️ Elegí un horario válido'); return; }
   
-  await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false});
+  // Guardar turno
+  await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, precio:parseInt(precio), atendido:false});
   
+  // ✅ REGISTRAR INGRESO AUTOMÁTICO EN FINANZAS
+  await refMovimientos.push({
+    tipo: 'ingreso',
+    descripcion: `Turno: ${servicio} — ${nombre} (${barbero})`,
+    monto: parseInt(precio),
+    fecha: fecha
+  });
+  
+  // Mostrar confirmación
   document.getElementById('formRes').classList.add('oculto');
   document.getElementById('confirmado').classList.remove('oculto');
   document.getElementById('rNombre').textContent = nombre;
@@ -356,6 +366,12 @@ async function confirmarTurno(){
   document.getElementById('rServicio').textContent = servicio;
   document.getElementById('rFecha').textContent = fecha;
   document.getElementById('rHora').textContent = hora;
+  document.getElementById('rPrecio').textContent = '$' + parseInt(precio).toLocaleString('es-AR');
+  
+  // ✅ BOTÓN DE WHATSAPP
+  const mensaje = encodeURIComponent(`✅ *TURNO CONFIRMADO*\n\n👤 Cliente: ${nombre}\n💇 Servicio: ${servicio}\n🧑‍💼 Barbero: ${barbero}\n📅 Fecha: ${fecha}\n⏰ Hora: ${hora}\n💰 Precio: $${parseInt(precio).toLocaleString('es-AR')}`);
+  const numWa = config.whatsapp.replace(/\D/g,'');
+  document.getElementById('btnWa').href = `https://wa.me/${numWa}?text=${mensaje}`;
 }
 
 function volver(){
@@ -369,7 +385,7 @@ function volver(){
   document.getElementById('inpTel').value='';
 }
 
-// ==== TURNOS ====
+// === TURNOS ===
 function cambiarFiltro(f){ filtroActual = f; document.querySelectorAll('#tab-turnos .filtro').forEach(b=>b.classList.remove('activo')); event.target.classList.add('activo'); listarTurnos(); }
 
 async function listarTurnos(){
@@ -385,7 +401,7 @@ async function listarTurnos(){
     c.innerHTML='';
     turnos.forEach(t=>{
       c.innerHTML += `<div class="item ${t.atendido?'atendido':''}">
-        <div><strong>${t.nombre}</strong>${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br><small style="color:var(--textoSec)">${t.barbero} · ${t.servicio} · ${t.fecha} ${t.hora}</small></div>
+        <div><strong>${t.nombre}</strong>${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br><small style="color:var(--textoSec)">${t.barbero} · ${t.servicio} · ${t.fecha} ${t.hora} · $${(t.precio||0).toLocaleString('es-AR')}</small></div>
         <div class="fila">${!t.atendido?`<button class="btn btn-verde" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`:`<button class="btn btn-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`}<button class="btn btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button></div>
       </div>`;
     });
@@ -396,7 +412,7 @@ async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:tr
 async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); listarTurnos(); }
 async function borrarTurno(id){ if(!confirm('¿Eliminar este turno?')) return; await refTurnos.child(id).remove(); listarTurnos(); }
 
-// ==== BARBEROS ====
+// === BARBEROS ===
 async function agregarBarbero(){
   const nom = document.getElementById('nuevoBarbero').value.trim();
   if(!nom || config.barberos.includes(nom)) return;
@@ -406,7 +422,7 @@ async function agregarBarbero(){
 async function eliminarBarbero(n){ if(!confirm(`¿Eliminar a "${n}"?`)) return; config.barberos=config.barberos.filter(b=>b!==n); await refConfig.update({barberos:config.barberos}); listarBarberos(); actualizarSelectores(); }
 function listarBarberos(){ const c=document.getElementById('listaBarberos'); c.innerHTML=''; config.barberos.forEach(b=>c.innerHTML+=`<div class="item"><span>${b}</span><button class="btn btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`); }
 
-// ==== SERVICIOS ====
+// === SERVICIOS ===
 async function agregarServicio(){
   const nom = document.getElementById('nuevoServicio').value.trim();
   const pre = parseInt(document.getElementById('precioServicio').value);
@@ -416,16 +432,16 @@ async function agregarServicio(){
 async function eliminarServicio(i){ if(!confirm('¿Eliminar servicio?')) return; config.servicios.splice(i,1); await refConfig.update({servicios:config.servicios}); listarServicios(); actualizarSelectores(); }
 function listarServicios(){ const c=document.getElementById('listaServicios'); c.innerHTML=''; config.servicios.forEach((s,i)=>c.innerHTML+=`<div class="item"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`); }
 
-// ==== AJUSTES ====
+// === AJUSTES ===
 async function guardarAjustes(){
-  config.whatsapp = document.getElementById('waBarberia').value;
+  config.whatsapp = document.getElementById('waBarberia').value.replace(/\D/g,'');
   const nuevaPass = document.getElementById('nuevaPass').value.trim();
   if(nuevaPass) config.contrasena = nuevaPass;
   await refConfig.update({whatsapp:config.whatsapp, contrasena:config.contrasena});
   alert('✅ Guardado correctamente');
 }
 
-// ==== FINANZAS ====
+// === FINANZAS ===
 async function agregarMovimiento(){
   const tipo = document.getElementById('tipoMov').value;
   const desc = document.getElementById('descMov').value.trim();
@@ -437,7 +453,6 @@ async function agregarMovimiento(){
   calcularTotales(); listarMovimientos();
 }
 
-// ✅ FUNCIÓN DE ELIMINAR MOVIMIENTOS — CORREGIDA
 async function borrarMovimiento(id){
   if(!confirm('¿Eliminar este movimiento?')) return;
   try {
@@ -490,7 +505,6 @@ async function listarMovimientos(){
   } catch { c.innerHTML='<p style="color:var(--alerta); text-align:center; padding:20px;">❌ Error al cargar</p>'; }
 }
 
-// CARGA INICIAL
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
   document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0];
