@@ -1,119 +1,293 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MÍSTICO — Reserva de Turnos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        *{margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif;}
-        body{background:#0a0f2b; color:#e0e0ff; padding:20px; max-width:580px; margin:0 auto; min-height:100vh;}
-        .cabecera{text-align:center; padding:15px 20px 20px; margin-bottom:15px; position:relative;}
-        .logo{max-width:130px; margin-bottom:8px;}
+        *{margin:0; padding:0; box-sizing:border-box;}
+        :root{
+            --fondo: #050714;
+            --fondoSec: #0F1229;
+            --fondoTarjeta: #141835;
+            --dorado: #D4AF37;
+            --doradoClaro: #F0D78C;
+            --doradoOscuro: #B8962F;
+            --texto: #E8E8F0;
+            --textoSec: #9CA0C2;
+            --borde: rgba(212,175,55,0.15);
+            --exito: #22C55E;
+            --alerta: #EF4444;
+            --whatsapp: #25D366;
+        }
+        body{
+            background: linear-gradient(160deg, var(--fondo) 0%, #0A0E24 100%);
+            color: var(--texto);
+            min-height:100vh;
+            font-family: 'Inter', sans-serif;
+            padding:24px 16px;
+            max-width:560px;
+            margin:0 auto;
+        }
+        .cabecera{
+            text-align:center;
+            padding:28px 20px 32px;
+            margin-bottom:24px;
+            position:relative;
+        }
+        .cabecera::after{
+            content:'';
+            position:absolute;
+            bottom:0; left:50%; transform:translateX(-50%);
+            width:80px; height:3px;
+            background:linear-gradient(90deg, transparent, var(--dorado), transparent);
+            border-radius:3px;
+        }
+        .logo{max-width:110px; margin-bottom:12px; filter:drop-shadow(0 0 12px rgba(212,175,55,0.25));}
         .logo:empty, .logo[src=""], .logo:not([src]){display:none !important;}
-        h1{color:#d4af37; font-size:30px; letter-spacing:4px;}
-        .subtitulo{color:#9999cc; font-size:14px; margin-top:5px;}
+        h1{
+            font-family: 'Playfair Display', serif;
+            color:var(--dorado);
+            font-size:38px;
+            letter-spacing:6px;
+            font-weight:700;
+            text-shadow:0 0 20px rgba(212,175,55,0.15);
+        }
+        .subtitulo{
+            color:var(--textoSec);
+            font-size:14px;
+            letter-spacing:3px;
+            margin-top:6px;
+            text-transform:uppercase;
+        }
 
         .oculto{display:none !important;}
-        .caja{background:#1a1f45; padding:22px; border-radius:12px; margin-bottom:20px; border:1px solid rgba(212,175,55,0.2);}
-        h2{color:#d4af37; font-size:18px; margin-bottom:18px; padding-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.2);}
-        h3{color:#b0b0e0; font-size:15px; margin:15px 0 10px;}
-        
-        label{display:block; margin:12px 0 5px; color:#b0b0e0; font-size:14px;}
-        input, select, button{width:100%; padding:12px; border:none; border-radius:6px; font-size:15px;}
-        input, select{background:#0f1433; color:#fff; border:2px solid rgba(212,175,55,0.2); outline:none;}
-        input:focus, select:focus{border-color:#d4af37;}
-        
-        .btn{padding:12px 20px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;}
-        .btn-amarillo{background:#d4af37; color:#000; margin-top:10px; width:100%; font-size:16px;}
-        .btn-verde{background:#25D366; color:#fff; margin-top:15px; width:100%; font-size:16px; text-decoration:none; display:block; text-align:center; padding:12px; border-radius:6px;}
-        .btn-rojo{background:#e74c3c; color:#fff; padding:6px 10px; font-size:12px; width:auto;}
-        .btn-chico-ok{background:#27ae60; color:#fff; padding:6px 10px; font-size:12px; width:auto;}
-        .btn-chico-gris{background:#666; color:#fff; padding:6px 10px; font-size:12px; width:auto;}
-        .btn-guardar{background:#27ae60; color:#fff; margin-top:10px;}
-        
-        .fila{display:flex; gap:8px; align-items:center; margin:8px 0; flex-wrap:wrap;}
-        .fila-doble{display:flex; gap:10px; flex-wrap:wrap;}
-        .fila-doble > *{flex:1; min-width:140px;}
-        .lista{margin-top:12px;}
-        .item{display:flex; justify-content:space-between; align-items:center; padding:12px; background:#0f1433; border-radius:6px; margin-bottom:8px; border-left:3px solid #d4af37; flex-wrap:wrap; gap:8px;}
-        .item.atendido{border-left-color:#27ae60; opacity:0.75;}
-        .item-chiquito{padding:8px 10px; align-items:center;}
-        .resumen{background:#0f1433; padding:15px; border-radius:8px; margin:15px 0; line-height:2;}
-        .resumen strong{color:#d4af37;}
-        .exito{color:#2ecc71; font-size:18px; font-weight:bold; text-align:center; margin:15px 0;}
-        .pass-box{max-width:320px; margin:0 auto; text-align:center;}
-        .etiqueta-atendido{background:#27ae60; color:#fff; font-size:11px; padding:2px 8px; border-radius:10px; margin-left:8px;}
-        .filtros{display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;}
-        .filtro{padding:6px 12px; background:transparent; border:1px solid #666; color:#ccc; border-radius:20px; font-size:13px; cursor:pointer; width:auto;}
-        .filtro.activo{border-color:#d4af37; color:#d4af37; background:rgba(212,175,55,0.1);}
-        .tabs{display:flex; gap:5px; margin-bottom:15px; border-bottom:1px solid rgba(212,175,55,0.2); flex-wrap:wrap;}
-        .tab{padding:10px 14px; color:#888; cursor:pointer; border-bottom:2px solid transparent; font-size:14px;}
-        .tab.activo{color:#d4af37; border-bottom-color:#d4af37;}
-        
-        .btn-admin-pequeño{
-            position:fixed; top:15px; right:15px; background:rgba(26,31,69,0.9);
-            border:1px solid rgba(212,175,55,0.3); color:#d4af37; font-size:18px;
-            width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            cursor:pointer; z-index:100; padding:0; transition:all 0.2s ease;
+        .caja{
+            background:var(--fondoTarjeta);
+            padding:28px 24px;
+            border-radius:16px;
+            margin-bottom:20px;
+            border:1px solid var(--borde);
+            box-shadow:0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+            backdrop-filter:blur(10px);
         }
-        .btn-admin-pequeño:hover{background:rgba(212,175,55,0.2); border-color:#d4af37;}
+        h2{
+            font-family: 'Playfair Display', serif;
+            color:var(--dorado);
+            font-size:20px;
+            margin-bottom:24px;
+            padding-bottom:12px;
+            border-bottom:1px solid var(--borde);
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        h3{
+            color:var(--doradoClaro);
+            font-size:15px;
+            margin:24px 0 12px;
+            font-weight:600;
+        }
         
-        .mensaje-caja{background:#0f1433; padding:12px; border-radius:6px; margin-top:15px; border:1px solid #25D366; white-space:pre-wrap; font-size:13px; color:#d0ffd0;}
-        .aviso{color:#ffcc00; font-size:13px; margin-top:8px;}
-        .aviso.error{color:#e74c3c;}
-        .guardado-ok{color:#2ecc71; font-size:13px; margin-top:8px; display:none;}
+        label{
+            display:block;
+            margin:18px 0 8px;
+            color:var(--textoSec);
+            font-size:13px;
+            font-weight:500;
+            text-transform:uppercase;
+            letter-spacing:1px;
+        }
+        input, select, button, textarea{
+            width:100%; padding:14px 16px;
+            border:none; border-radius:10px;
+            font-size:15px;
+            font-family:inherit;
+            transition:all 0.25s ease;
+        }
+        input, select, textarea{
+            background:var(--fondoSec);
+            color:var(--texto);
+            border:2px solid transparent;
+            outline:none;
+        }
+        input:focus, select:focus, textarea:focus{
+            border-color:var(--dorado);
+            box-shadow:0 0 0 4px rgba(212,175,55,0.1);
+        }
+        input::placeholder{color:#55597D;}
+        
+        .btn{
+            padding:14px 24px; border:none; border-radius:10px;
+            font-weight:600; cursor:pointer;
+            font-size:15px;
+            letter-spacing:0.5px;
+            transition:all 0.2s ease;
+            font-family:inherit;
+        }
+        .btn:hover{transform:translateY(-1px);}
+        .btn:active{transform:translateY(0);}
+        
+        .btn-dorado{
+            background:linear-gradient(135deg, var(--doradoClaro) 0%, var(--dorado) 50%, var(--doradoOscuro) 100%);
+            color:#000;
+            margin-top:24px;
+            width:100%;
+            box-shadow:0 4px 16px rgba(212,175,55,0.3);
+        }
+        .btn-dorado:hover{box-shadow:0 6px 20px rgba(212,175,55,0.4);}
+        
+        .btn-whatsapp{
+            background:var(--whatsapp);
+            color:#fff;
+            margin-top:20px;
+            width:100%;
+            text-decoration:none;
+            display:block;
+            text-align:center;
+            padding:14px;
+            border-radius:10px;
+            box-shadow:0 4px 16px rgba(37,211,102,0.25);
+        }
+        .btn-whatsapp:hover{background:#20BD5C;}
+        
+        .btn-rojo{background:var(--alerta); color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
+        .btn-verde{background:var(--exito); color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
+        .btn-gris{background:#3F425F; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
+        .btn-guardar{background:var(--exito); color:#fff; margin-top:20px; width:100%; box-shadow:0 4px 12px rgba(34,197,94,0.25);}
+        
+        .fila{display:flex; gap:10px; align-items:center; margin:10px 0; flex-wrap:wrap;}
+        .fila-doble{display:flex; gap:12px; flex-wrap:wrap;}
+        .fila-doble > *{flex:1; min-width:140px;}
+        .lista{margin-top:16px;}
+        .item{
+            display:flex; justify-content:space-between; align-items:center;
+            padding:16px; background:var(--fondoSec); border-radius:12px;
+            margin-bottom:10px; border-left:3px solid var(--dorado);
+            flex-wrap:wrap; gap:10px;
+            transition:all 0.2s ease;
+        }
+        .item:hover{transform:translateX(4px);}
+        .item.atendido{border-left-color:var(--exito); opacity:0.7;}
+        .item-chiquito{padding:12px 14px;}
+        .resumen{
+            background:var(--fondoSec); padding:24px; border-radius:12px;
+            margin:20px 0; line-height:2.2;
+            border:1px solid var(--borde);
+        }
+        .resumen strong{color:var(--dorado); font-weight:600;}
+        .exito{
+            color:var(--exito); font-size:20px; font-weight:700; text-align:center;
+            margin:20px 0; letter-spacing:1px;
+        }
+        .pass-box{max-width:340px; margin:0 auto; text-align:center;}
+        .etiqueta-atendido{
+            background:var(--exito); color:#fff; font-size:11px;
+            padding:3px 10px; border-radius:20px; margin-left:10px;
+            font-weight:600;
+        }
+        .filtros{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
+        .filtro{
+            padding:8px 16px; background:transparent; border:1px solid #3F425F;
+            color:var(--textoSec); border-radius:20px; font-size:13px;
+            cursor:pointer; width:auto; font-weight:500;
+            transition:all 0.2s ease;
+        }
+        .filtro.activo{
+            border-color:var(--dorado); color:var(--doradoClaro);
+            background:rgba(212,175,55,0.1);
+        }
+        .tabs{
+            display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--borde);
+            flex-wrap:wrap;
+        }
+        .tab{
+            padding:12px 16px; color:var(--textoSec); cursor:pointer;
+            border-bottom:2px solid transparent; font-size:14px;
+            font-weight:500; transition:all 0.2s ease;
+        }
+        .tab.activo{color:var(--doradoClaro); border-bottom-color:var(--dorado);}
+        
+        .btn-admin-flotante{
+            position:fixed; top:16px; right:16px; background:var(--fondoTarjeta);
+            border:1px solid var(--borde); color:var(--dorado); font-size:20px;
+            width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            cursor:pointer; z-index:100; padding:0; box-shadow:0 4px 16px rgba(0,0,0,0.4);
+            transition:all 0.2s ease;
+        }
+        .btn-admin-flotante:hover{background:rgba(212,175,55,0.1); transform:scale(1.1);}
+        
+        .mensaje-caja{
+            background:var(--fondoSec); padding:16px; border-radius:10px;
+            margin-top:16px; border:1px solid rgba(37,211,102,0.3);
+            white-space:pre-wrap; font-size:13px; color:#B8F0C8;
+            line-height:1.8;
+        }
+        .aviso{color:#FBBF24; font-size:13px; margin-top:10px; display:flex; align-items:center; gap:6px;}
+        .aviso.error{color:var(--alerta);}
+        .guardado-ok{
+            color:var(--exito); font-size:13px; margin-top:10px; display:none;
+            font-weight:500;
+        }
+        .divisor{height:1px; background:linear-gradient(90deg, transparent, var(--borde), transparent); margin:24px 0;}
+        .info-horario{background:rgba(212,175,55,0.08); border:1px dashed var(--dorado); border-radius:10px; padding:12px; margin-top:12px; font-size:13px; color:var(--doradoClaro);}
     </style>
 </head>
 <body>
 
-<button class="btn-admin-pequeño" onclick="irA('admin')" title="Panel de Administración">⚙️</button>
+<button class="btn-admin-flotante" onclick="irA('admin')" title="Panel de Administración">⚙️</button>
 
 <div class="cabecera">
     <img src="https://i.imgur.com/8ZxXQfL.png" alt="Logo Místico" class="logo" onerror="this.style.display='none'">
     <h1>MÍSTICO</h1>
-    <p class="subtitulo">Reserva de Turnos</p>
+    <p class="subtitulo">Barbería</p>
 </div>
 
 <div id="reservar">
     <div class="caja">
-        <h2>📅 Pedí tu Turno</h2>
+        <h2>📅 Reservar tu Turno</h2>
         <div id="formRes">
-            <label>Barbero *</label>
+            <label>Barbero</label>
             <select id="selBarbero" onchange="cargarHorariosDisponibles()">
-                <option value="">— Elegí —</option>
+                <option value="">— Seleccionar —</option>
                 <option value="Nico">Nico</option>
             </select>
 
-            <label>Servicio *</label>
+            <label>Servicio</label>
             <select id="selServicio">
-                <option value="">— Elegí —</option>
+                <option value="">— Seleccionar —</option>
                 <option value="Corte de cabello — $5.000">Corte de cabello — $5.000</option>
                 <option value="Arreglo de barba — $3.500">Arreglo de barba — $3.500</option>
                 <option value="Corte + Barba — $7.500">Corte + Barba — $7.500</option>
                 <option value="Afeitado clásico — $4.000">Afeitado clásico — $4.000</option>
             </select>
 
-            <label>Fecha *</label>
+            <label>Fecha</label>
             <input type="date" id="selFecha" onchange="cargarHorariosDisponibles()">
 
-            <label>Horario *</label>
+            <label>Horario Disponible</label>
             <select id="selHora">
                 <option value="">— Elegí primero barbero y fecha —</option>
             </select>
             <p id="avisoHorario" class="aviso oculto"></p>
 
-            <label>Tu Nombre Completo *</label>
+            <div class="divisor"></div>
+
+            <label>Tu Nombre Completo</label>
             <input type="text" id="inpNombre" placeholder="Ej: Juan Pérez">
 
-            <label>Tu WhatsApp / Teléfono *</label>
-            <input type="tel" id="inpTel" placeholder="+54 9 294 ...">
+            <label>Tu WhatsApp / Teléfono</label>
+            <input type="tel" id="inpTel" placeholder="+54 9 298 123-4567">
 
-            <button class="btn btn-amarillo" onclick="generarTurno()">✅ ARMAR TURNO</button>
+            <button class="btn btn-dorado" onclick="generarTurno()">✅ CONFIRMAR TURNO</button>
         </div>
 
         <div id="confirmado" class="oculto">
             <div class="exito">✅ ¡TURNO CONFIRMADO!</div>
+            <p style="text-align:center; color:var(--textoSec); margin-bottom:20px;">Guardá o compartí los datos de tu reserva</p>
             <div class="resumen">
                 <strong>Nombre:</strong> <span id="rNombre"></span><br>
                 <strong>Barbero:</strong> <span id="rBarbero"></span><br>
@@ -121,20 +295,24 @@
                 <strong>Fecha:</strong> <span id="rFecha"></span><br>
                 <strong>Hora:</strong> <span id="rHora"></span>
             </div>
-            <a id="botonWA" class="btn-verde" href="" target="_blank" rel="noopener noreferrer">💬 ENVIAR POR WHATSAPP</a>
-            <p style="color:#888; font-size:12px; text-align:center; margin:10px 0 5px;">Si no abre, copiá y mandá este mensaje:</p>
+            
+            <a id="botonWA" class="btn-whatsapp" href="" target="_blank" rel="noopener noreferrer">💬 ENVIAR POR WHATSAPP</a>
+            
+            <p style="color:var(--textoSec); font-size:12px; text-align:center; margin:16px 0 8px;">Si no abre, copiá y mandá este mensaje:</p>
             <div class="mensaje-caja" id="cajaMensaje"></div>
-            <button class="btn btn-amarillo" style="background:#444; color:#fff; margin-top:15px;" onclick="volver()">🔄 Volver</button>
+            
+            <button class="btn btn-gris" style="width:100%; margin-top:20px;" onclick="volver()">🔄 Reservar otro turno</button>
         </div>
     </div>
 </div>
 
 <div id="admin" class="oculto">
     <div class="caja pass-box" id="cajaPass">
-        <h2 style="text-align:center; border:none;">🔒 Panel de Control</h2>
+        <h2 style="justify-content:center; border:none; padding-bottom:0;">🔒 Acceso Administrativo</h2>
+        <p style="text-align:center; color:var(--textoSec); margin-bottom:20px; font-size:14px;">Ingresá tu contraseña para continuar</p>
         <input type="password" id="passAdmin" placeholder="Contraseña">
-        <button class="btn btn-amarillo" onclick="ingresar()">Entrar</button>
-        <button class="btn-chico-gris" style="margin-top:10px; width:auto;" onclick="irA('reservar')">← Volver</button>
+        <button class="btn btn-dorado" onclick="ingresar()">Ingresar</button>
+        <button class="btn btn-gris" style="margin-top:12px; width:auto; display:block; margin-left:auto; margin-right:auto;" onclick="irA('reservar')">← Volver</button>
     </div>
 
     <div id="panelConfig" class="oculto">
@@ -152,62 +330,73 @@
                     <button class="filtro" onclick="cambiarFiltro('pendientes')">⏳ Pendientes</button>
                     <button class="filtro" onclick="cambiarFiltro('atendidos')">✅ Atendidos</button>
                 </div>
-                <div class="lista" id="listaTurnos"><p style="color:#888; text-align:center; padding:20px;">Cargando turnos...</p></div>
+                <div class="lista" id="listaTurnos"><p style="color:var(--textoSec); text-align:center; padding:30px;">Cargando turnos...</p></div>
             </div>
         </div>
 
         <div id="tab-barberos" class="oculto">
             <div class="caja">
-                <h3>Agregar Barbero</h3>
+                <h3>Agregar Nuevo Barbero</h3>
                 <input type="text" id="nuevoBarbero" placeholder="Nombre del barbero">
-                <button class="btn btn-amarillo" onclick="agregarBarbero()">➕ Agregar</button>
-                <p class="guardado-ok" id="guardadoBarbero">✅ Guardado en la nube</p>
-                <h3 style="margin-top:25px;">Lista de Barberos</h3>
-                <div id="listaBarberos"><p style="color:#888; padding:10px;">Nico</p></div>
+                <button class="btn btn-dorado" onclick="agregarBarbero()">➕ Agregar</button>
+                <p class="guardado-ok" id="guardadoBarbero">✅ Guardado en la nube — Actualizado en todos los dispositivos</p>
+                
+                <h3>Lista de Barberos</h3>
+                <div id="listaBarberos"><p style="color:var(--textoSec); padding:10px;">Cargando...</p></div>
             </div>
         </div>
 
         <div id="tab-servicios" class="oculto">
             <div class="caja">
-                <h3>Agregar Servicio</h3>
+                <h3>Agregar Nuevo Servicio</h3>
                 <div class="fila-doble">
                     <input type="text" id="nuevoServicio" placeholder="Nombre del servicio">
-                    <input type="number" id="precioServicio" placeholder="Precio" style="width:120px;">
+                    <input type="number" id="precioServicio" placeholder="Precio $" style="width:120px;">
                 </div>
-                <button class="btn btn-amarillo" onclick="agregarServicio()">➕ Agregar</button>
-                <p class="guardado-ok" id="guardadoServicio">✅ Guardado en la nube</p>
-                <h3 style="margin-top:25px;">Lista de Servicios</h3>
-                <div id="listaServicios">
-                    <div class="item item-chiquito"><span>Corte de cabello — $5.000</span></div>
-                    <div class="item item-chiquito"><span>Arreglo de barba — $3.500</span></div>
-                    <div class="item item-chiquito"><span>Corte + Barba — $7.500</span></div>
-                    <div class="item item-chiquito"><span>Afeitado clásico — $4.000</span></div>
-                </div>
+                <button class="btn btn-dorado" onclick="agregarServicio()">➕ Agregar</button>
+                <p class="guardado-ok" id="guardadoServicio">✅ Guardado en la nube — Actualizado en todos los dispositivos</p>
+                
+                <h3>Lista de Servicios</h3>
+                <div id="listaServicios"><p style="color:var(--textoSec); padding:10px;">Cargando...</p></div>
             </div>
         </div>
 
         <div id="tab-ajustes" class="oculto">
             <div class="caja">
-                <h3>⏰ Horarios de Atención</h3>
-                <label>Desde las</label>
-                <input type="time" id="horaInicio" value="09:00">
-                <label>Hasta las</label>
-                <input type="time" id="horaFin" value="21:00">
+                <h3>⏰ Horario de Atención (Horario Partido / Cortado)</h3>
+                <p class="info-horario">🕒 Mañana → desde las <strong>hora inicio</strong> hasta las <strong>hora fin mañana</strong><br>
+                🌅 Tarde → desde las <strong>hora inicio tarde</strong> hasta las <strong>hora fin tarde</strong><br>
+                ⏸️ El horario entre el fin de mañana y el inicio de tarde queda <strong>cerrado</strong></p>
+                
+                <label>Hora inicio mañana</label>
+                <input type="time" id="horaInicioManana" value="09:00">
+                <label>Hora fin mañana</label>
+                <input type="time" id="horaFinManana" value="13:00">
+                
+                <div class="divisor"></div>
+                
+                <label>Hora inicio tarde</label>
+                <input type="time" id="horaInicioTarde" value="16:00">
+                <label>Hora fin tarde</label>
+                <input type="time" id="horaFinTarde" value="21:00">
+                
                 <label>Intervalo entre turnos (minutos)</label>
                 <input type="number" id="intervaloMin" value="30" min="15" step="15">
 
-                <h3>🔒 Seguridad y Contacto</h3>
-                <label>Nueva Contraseña</label>
-                <input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
-                <label>WhatsApp de la Barbería</label>
-                <input type="tel" id="waBarberia" value="5492984548329">
+                <div class="divisor"></div>
 
-                <button class="btn btn-guardar" onclick="guardarAjustes()">💾 GUARDAR</button>
-                <p class="guardado-ok" id="guardadoAjustes">✅ Guardado en la nube</p>
+                <h3>🔒 Seguridad y Contacto</h3>
+                <label>WhatsApp de la Barbería</label>
+                <input type="tel" id="waBarberia" value="5492984548329" placeholder="549...">
+                <label>Nueva Contraseña de Administración</label>
+                <input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
+
+                <button class="btn btn-guardar" onclick="guardarAjustes()">💾 GUARDAR TODOS LOS CAMBIOS</button>
+                <p class="guardado-ok" id="guardadoAjustes">✅ Guardado en la nube — Todos los dispositivos actualizados</p>
             </div>
         </div>
 
-        <button class="btn-chico-gris" style="margin-top:10px; width:auto;" onclick="irA('reservar')">← Volver</button>
+        <button class="btn btn-gris" style="margin-top:16px; width:auto; display:block; margin-left:auto; margin-right:auto;" onclick="irA('reservar')">← Volver a Reservas</button>
     </div>
 </div>
 
@@ -233,8 +422,10 @@ const refConfig = db.ref('configuracion');
 let config = {
   contrasena: 'admin123',
   whatsapp: '5492984548329',
-  horaInicio: '09:00',
-  horaFin: '21:00',
+  horaInicioManana: '09:00',
+  horaFinManana: '13:00',
+  horaInicioTarde: '16:00',
+  horaFinTarde: '21:00',
   intervalo: 30,
   barberos: ['Nico'],
   servicios: [
@@ -248,7 +439,6 @@ let config = {
 let filtroActual = 'todos';
 let paginaActual = 'reservar';
 
-// Cargar configuración de Firebase y actualizar
 refConfig.on('value', snap => {
   if(snap.exists()){
     const datos = snap.val();
@@ -267,299 +457,8 @@ function actualizarSelectores(){
   const selS = document.getElementById('selServicio');
   if(!selB || !selS) return;
   
-  selB.innerHTML = '<option value="">— Elegí —</option>';
-  selS.innerHTML = '<option value="">— Elegí —</option>';
+  selB.innerHTML = '<option value="">— Seleccionar —</option>';
+  selS.innerHTML = '<option value="">— Seleccionar —</option>';
   
   config.barberos.forEach(b => selB.innerHTML += `<option value="${b}">${b}</option>`);
-  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
-}
-
-function irA(pagina){
-  paginaActual = pagina;
-  document.getElementById('reservar').classList.add('oculto');
-  document.getElementById('admin').classList.add('oculto');
-  document.getElementById(pagina).classList.remove('oculto');
-  
-  if(pagina==='reservar'){
-    document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-    actualizarSelectores();
-  }
-  if(pagina==='admin'){
-    document.getElementById('cajaPass').classList.remove('oculto');
-    document.getElementById('panelConfig').classList.add('oculto');
-  }
-}
-
-function ingresar(){
-  if(document.getElementById('passAdmin').value === config.contrasena){
-    document.getElementById('cajaPass').classList.add('oculto');
-    document.getElementById('panelConfig').classList.remove('oculto');
-    cambiarTab('turnos');
-    listarTurnos();
-    listarBarberos();
-    listarServicios();
-    cargarAjustesEnFormulario();
-  }else{
-    alert('❌ Contraseña incorrecta');
-  }
-}
-
-function cambiarTab(nombre){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
-  event.target.classList.add('activo');
-  ['turnos','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
-  document.getElementById('tab-'+nombre).classList.remove('oculto');
-  if(nombre === 'ajustes') cargarAjustesEnFormulario();
-}
-
-function generarHorarios(){
-  const horarios = [];
-  let [hI, mI] = config.horaInicio.split(':').map(Number);
-  let [hF, mF] = config.horaFin.split(':').map(Number);
-  let actual = hI * 60 + mI;
-  const fin = hF * 60 + mF;
-  while(actual <= fin){
-    const hh = Math.floor(actual / 60);
-    const mm = (actual % 60).toString().padStart(2,'0');
-    horarios.push(`${hh}:${mm}`);
-    actual += config.intervalo;
-  }
-  return horarios;
-}
-
-async function cargarHorariosDisponibles(){
-  const barbero = document.getElementById('selBarbero').value;
-  const fecha = document.getElementById('selFecha').value;
-  const selH = document.getElementById('selHora');
-  const aviso = document.getElementById('avisoHorario');
-  
-  selH.innerHTML = '<option value="">— Elegí horario —</option>';
-  aviso.classList.add('oculto');
-  
-  if(!barbero || !fecha) return;
-
-  aviso.classList.remove('oculto');
-  aviso.textContent = '⏳ Cargando...';
-
-  try {
-    const snap = await refTurnos.once('value');
-    const todosTurnos = snap.val() || {};
-    const ocupados = Object.values(todosTurnos)
-      .filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha)
-      .map(t => t.hora);
-
-    const HORARIOS = generarHorarios();
-    let hayDisponibles = false;
-    HORARIOS.forEach(hora => {
-      if(!ocupados.includes(hora)){
-        selH.innerHTML += `<option value="${hora}">${hora}</option>`;
-        hayDisponibles = true;
-      }
-    });
-
-    if(!hayDisponibles) selH.innerHTML = '<option value="">❌ No hay horarios disponibles</option>';
-    aviso.textContent = hayDisponibles ? '✅ Listo' : '⚠️ No hay turnos libres';
-    setTimeout(() => aviso.classList.add('oculto'), 2000);
-  } catch (error) {
-    aviso.textContent = '❌ Sin conexión';
-    aviso.classList.add('error');
-  }
-}
-
-async function generarTurno(){
-  const nombre = document.getElementById('inpNombre').value.trim();
-  const barbero = document.getElementById('selBarbero').value;
-  const servicio = document.getElementById('selServicio').value;
-  const fecha = document.getElementById('selFecha').value;
-  const hora = document.getElementById('selHora').value;
-  const tel = document.getElementById('inpTel').value.trim();
-
-  if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){
-    alert('⚠️ Completá todos los campos'); return;
-  }
-  if(hora.includes('❌') || hora === ''){
-    alert('⚠️ Elegí un horario válido'); return;
-  }
-
-  const snap = await refTurnos.once('value');
-  const todosTurnos = snap.val() || {};
-  const yaOcupado = Object.values(todosTurnos).some(t => !t.atendido && t.barbero === barbero && t.fecha === fecha && t.hora === hora);
-  
-  if(yaOcupado){
-    alert('❌ ¡Ese horario ya fue reservado! Elegí otro.');
-    cargarHorariosDisponibles();
-    return;
-  }
-
-  await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false});
-
-  const mensaje = `Hola! Quisiera reservar un turno en MÍSTICO:
-
-👤 Nombre: ${nombre}
-📞 WhatsApp: ${tel}
-✂️ Barbero: ${barbero}
-💇 Servicio: ${servicio}
-📅 Fecha: ${fecha}
-⏰ Hora: ${hora}
-
-¡Gracias!`;
-
-  const enlace = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
-
-  document.getElementById('formRes').classList.add('oculto');
-  document.getElementById('confirmado').classList.remove('oculto');
-  document.getElementById('rNombre').textContent = nombre;
-  document.getElementById('rBarbero').textContent = barbero;
-  document.getElementById('rServicio').textContent = servicio;
-  document.getElementById('rFecha').textContent = fecha;
-  document.getElementById('rHora').textContent = hora;
-  document.getElementById('botonWA').href = enlace;
-  document.getElementById('cajaMensaje').textContent = mensaje;
-}
-
-function volver(){
-  document.getElementById('formRes').classList.remove('oculto');
-  document.getElementById('confirmado').classList.add('oculto');
-  document.getElementById('inpNombre').value='';
-  document.getElementById('selBarbero').value='';
-  document.getElementById('selServicio').value='';
-  document.getElementById('selFecha').value='';
-  document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
-  document.getElementById('inpTel').value='';
-}
-
-function cambiarFiltro(filtro){
-  filtroActual = filtro;
-  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
-  event.target.classList.add('activo');
-  listarTurnos();
-}
-
-async function listarTurnos(){
-  const c = document.getElementById('listaTurnos'); c.innerHTML='<p style="color:#888; text-align:center; padding:20px;">Cargando...</p>';
-  
-  try {
-    const snap = await refTurnos.once('value');
-    const datos = snap.val() || {};
-    let turnos = Object.entries(datos).map(([id, t]) => ({...t, id}));
-    
-    if(turnos.length === 0){
-      c.innerHTML = '<p style="color:#888; text-align:center; padding:20px;">No hay turnos registrados</p>';
-      return;
-    }
-
-    turnos = turnos.sort((a,b)=> new Date(b.fecha+'T'+b.hora) - new Date(a.fecha+'T'+a.hora));
-    if(filtroActual === 'pendientes') turnos = turnos.filter(t=>!t.atendido);
-    if(filtroActual === 'atendidos') turnos = turnos.filter(t=>t.atendido);
-
-    c.innerHTML = '';
-    turnos.forEach(t=>{
-      c.innerHTML += `
-        <div class="item ${t.atendido?'atendido':''}">
-            <div style="flex:1; min-width:200px;">
-                <strong>${t.nombre}</strong>
-                ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}
-                <br><small style="color:#999;">${t.barbero} · ${t.servicio}</small>
-                <br><small style="color:#d4af37;">📅 ${t.fecha} ⏰ ${t.hora}</small>
-            </div>
-            <div class="fila">
-                ${!t.atendido
-                    ?`<button class="btn-chico-ok" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`
-                    :`<button class="btn-chico-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`
-                }
-                <button class="btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button>
-            </div>
-        </div>
-      `;
-    });
-  } catch (err) {
-    c.innerHTML = '<p style="color:#e74c3c; text-align:center; padding:20px;">❌ Error cargando turnos</p>';
-  }
-}
-
-async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
-async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); }
-async function borrarTurno(id){ if(!confirm('¿Eliminar este turno?')) return; await refTurnos.child(id).remove(); }
-
-async function agregarBarbero(){
-  const nom = document.getElementById('nuevoBarbero').value.trim();
-  if(!nom || config.barberos.includes(nom)) return;
-  config.barberos.push(nom);
-  await refConfig.update({barberos: config.barberos});
-  document.getElementById('nuevoBarbero').value='';
-  document.getElementById('guardadoBarbero').style.display='block';
-  setTimeout(()=>document.getElementById('guardadoBarbero').style.display='none',2500);
-  listarBarberos();
-}
-
-async function eliminarBarbero(nom){
-  if(!confirm(`¿Eliminar a "${nom}"? No afecta turnos reservados`)) return;
-  config.barberos = config.barberos.filter(b=>b!==nom);
-  await refConfig.update({barberos: config.barberos});
-  listarBarberos();
-}
-
-function listarBarberos(){
-  const c = document.getElementById('listaBarberos'); c.innerHTML='';
-  config.barberos.forEach(b=>{
-    c.innerHTML += `<div class="item item-chiquito"><span>${b}</span><button class="btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`;
-  });
-}
-
-async function agregarServicio(){
-  const nom = document.getElementById('nuevoServicio').value.trim();
-  const pre = parseInt(document.getElementById('precioServicio').value);
-  if(!nom || !pre) return;
-  config.servicios.push({nombre:nom, precio:pre});
-  await refConfig.update({servicios: config.servicios});
-  document.getElementById('nuevoServicio').value='';
-  document.getElementById('precioServicio').value='';
-  document.getElementById('guardadoServicio').style.display='block';
-  setTimeout(()=>document.getElementById('guardadoServicio').style.display='none',2500);
-  listarServicios();
-}
-
-async function eliminarServicio(indice){
-  if(!confirm('¿Eliminar este servicio? No afecta turnos reservados')) return;
-  config.servicios.splice(indice,1);
-  await refConfig.update({servicios: config.servicios});
-  listarServicios();
-}
-
-function listarServicios(){
-  const c = document.getElementById('listaServicios'); c.innerHTML='';
-  config.servicios.forEach((s,i)=>{
-    c.innerHTML += `<div class="item item-chiquito"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`;
-  });
-}
-
-function cargarAjustesEnFormulario(){
-  document.getElementById('horaInicio').value = config.horaInicio;
-  document.getElementById('horaFin').value = config.horaFin;
-  document.getElementById('intervaloMin').value = config.intervalo;
-  document.getElementById('waBarberia').value = config.whatsapp;
-  document.getElementById('nuevaPass').value = '';
-}
-
-async function guardarAjustes(){
-  const nuevos = {
-    horaInicio: document.getElementById('horaInicio').value,
-    horaFin: document.getElementById('horaFin').value,
-    intervalo: parseInt(document.getElementById('intervaloMin').value),
-    whatsapp: document.getElementById('waBarberia').value.trim()
-  };
-  const nuevaPass = document.getElementById('nuevaPass').value.trim();
-  if(nuevaPass) nuevos.contrasena = nuevaPass;
-  
-  await refConfig.update(nuevos);
-  document.getElementById('guardadoAjustes').style.display='block';
-  setTimeout(()=>document.getElementById('guardadoAjustes').style.display='none',2500);
-  if(nuevaPass) alert('✅ Contraseña cambiada');
-  config = {...config, ...nuevos};
-}
-
-document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-</script>
-
-</body>
-</html>
+  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s
