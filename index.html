@@ -42,7 +42,8 @@
         .filtro.activo{border-color:#d4af37; color:#d4af37; background:rgba(212,175,55,0.1);}
         .btn-admin-pequeño{position:fixed; top:10px; right:10px; background:transparent; border:none; color:#666; font-size:20px; cursor:pointer; z-index:100;}
         .mensaje-caja{background:#0f1433; padding:12px; border-radius:6px; margin-top:15px; border:1px solid #25D366; white-space:pre-wrap; font-size:13px; color:#d0ffd0;}
-        .cargando{text-align:center; padding:20px; color:#888;}
+        .aviso{color:#ffcc00; font-size:13px; margin-top:8px;}
+        .aviso.error{color:#e74c3c;}
     </style>
 </head>
 <body>
@@ -79,8 +80,9 @@
 
             <label>Horario *</label>
             <select id="selHora">
-                <option value="">— Elegí barbero y fecha —</option>
+                <option value="">— Elegí primero barbero y fecha —</option>
             </select>
+            <p id="avisoHorario" class="aviso oculto"></p>
 
             <label>Tu Nombre Completo *</label>
             <input type="text" id="inpNombre" placeholder="Ej: Juan Pérez">
@@ -127,13 +129,13 @@
                 <button class="filtro" onclick="cambiarFiltro('pendientes')">⏳ Pendientes</button>
                 <button class="filtro" onclick="cambiarFiltro('atendidos')">✅ Atendidos</button>
             </div>
-            <div class="lista" id="listaTurnos"><p class="cargando">Cargando turnos...</p></div>
+            <div class="lista" id="listaTurnos"><p style="color:#888; text-align:center; padding:20px;">Cargando turnos...</p></div>
         </div>
         <button class="btn-chico-gris" style="margin-top:10px; width:auto;" onclick="irA('reservar')">← Volver a la página principal</button>
     </div>
 </div>
 
-<!-- Firebase — Base de datos en la nube -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
@@ -141,7 +143,7 @@
 const CONTRASEÑA = 'admin123';
 const TU_WHATSAPP = '5492984548329';
 
-// HORARIOS FIJOS: 9:00 a 12:00 y 15:00 a 21:00 cada 30 min
+// HORARIOS: 9:00 a 12:00 y 15:00 a 21:00 cada 30 min
 const HORARIOS = [];
 for(let h=9; h<12; h++){
     HORARIOS.push(`${h}:00`);
@@ -156,9 +158,7 @@ HORARIOS.push('21:00');
 
 let filtroActual = 'todos';
 
-// ==============================================================
-// 🔧 CONFIGURACIÓN DE TU BASE DE DATOS DE FIREBASE
-// ==============================================================
+// ✅ TUS DATOS DE FIREBASE YA CONFIGURADOS
 const firebaseConfig = {
   apiKey: "AIzaSyAe-Ysqg7w8HzQ707MEqd4tiqH7qZWHGMA",
   authDomain: "mistico-barberia.firebaseapp.com",
@@ -166,22 +166,20 @@ const firebaseConfig = {
   projectId: "mistico-barberia",
   storageBucket: "mistico-barberia.firebasestorage.app",
   messagingSenderId: "314274452478",
-  appId: "1:314274452478:web:a1a2e2d7e163576d52a6af",
-  measurementId: "G-E9M4WL67JH"
+  appId: "1:314274452478:web:78b575fb8b73162b52a6af"
 };
 
-// Inicializar base de datos
+// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const refTurnos = db.ref('turnos');
 
-// Escuchar cambios en tiempo real → se actualiza automáticamente para todos
+// Actualizar horarios en tiempo real para todos
 refTurnos.on('value', () => {
-    if(!document.getElementById('panelConfig').classList.contains('oculto')) listarTurnos();
     if(!document.getElementById('reservar').classList.contains('oculto')) cargarHorariosDisponibles();
+    if(!document.getElementById('panelConfig').classList.contains('oculto')) listarTurnos();
 });
 
-// ============== NAVEGACIÓN ==============
 function irA(pagina){
     document.getElementById('reservar').classList.add('oculto');
     document.getElementById('admin').classList.add('oculto');
@@ -191,7 +189,8 @@ function irA(pagina){
         document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
         document.getElementById('selBarbero').value='';
         document.getElementById('selServicio').value='';
-        document.getElementById('selHora').innerHTML='<option value="">— Elegí barbero y fecha —</option>';
+        document.getElementById('selFecha').value='';
+        document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
     }
     if(pagina==='admin') listarTurnos();
 }
@@ -206,29 +205,51 @@ function ingresar(){
     }
 }
 
-// ============== CARGAR HORARIOS DISPONIBLES DESDE LA NUBE ==============
+// CARGAR HORARIOS DESDE LA NUBE
 async function cargarHorariosDisponibles(){
     const barbero = document.getElementById('selBarbero').value;
     const fecha = document.getElementById('selFecha').value;
     const selH = document.getElementById('selHora');
+    const aviso = document.getElementById('avisoHorario');
     
     selH.innerHTML = '<option value="">— Elegí horario —</option>';
+    aviso.classList.add('oculto');
+    aviso.classList.remove('error');
+    
     if(!barbero || !fecha) return;
 
-    // Traer TODOS los turnos ocupados DESDE LA NUBE
-    const snap = await refTurnos.once('value');
-    const todosTurnos = snap.val() || {};
-    const ocupados = Object.values(todosTurnos).filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha).map(t => t.hora);
+    aviso.classList.remove('oculto');
+    aviso.textContent = '⏳ Cargando horarios...';
 
-    // Mostrar solo los horarios que NO están ocupados
-    HORARIOS.forEach(hora => {
-        if(!ocupados.includes(hora)){
-            selH.innerHTML += `<option value="${hora}">${hora}</option>`;
+    try {
+        const snap = await refTurnos.once('value');
+        const todosTurnos = snap.val() || {};
+        const ocupados = Object.values(todosTurnos)
+            .filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha)
+            .map(t => t.hora);
+
+        let hayDisponibles = false;
+        HORARIOS.forEach(hora => {
+            if(!ocupados.includes(hora)){
+                selH.innerHTML += `<option value="${hora}">${hora}</option>`;
+                hayDisponibles = true;
+            }
+        });
+
+        if(!hayDisponibles){
+            selH.innerHTML = '<option value="">❌ No hay horarios disponibles ese día</option>';
         }
-    });
+
+        aviso.textContent = hayDisponibles ? '✅ Listo' : '⚠️ No hay turnos libres ese día';
+        setTimeout(() => aviso.classList.add('oculto'), 2000);
+
+    } catch (error) {
+        aviso.textContent = '❌ Sin conexión. Probá más tarde.';
+        aviso.classList.add('error');
+    }
 }
 
-// ============== GENERAR TURNO — GUARDAR EN LA NUBE ==============
+// GUARDAR TURNO EN LA NUBE
 async function generarTurno(){
     const nombre = document.getElementById('inpNombre').value.trim();
     const barbero = document.getElementById('selBarbero').value;
@@ -240,8 +261,11 @@ async function generarTurno(){
     if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){
         alert('⚠️ Completá TODOS los campos'); return;
     }
+    if(hora.includes('❌') || hora === ''){
+        alert('⚠️ Elegí un horario válido'); return;
+    }
 
-    // Verificar en la NUBE si ya está ocupado
+    // Verificar si ya está ocupado EN LA NUBE
     const snap = await refTurnos.once('value');
     const todosTurnos = snap.val() || {};
     const yaOcupado = Object.values(todosTurnos).some(t => !t.atendido && t.barbero === barbero && t.fecha === fecha && t.hora === hora);
@@ -252,7 +276,7 @@ async function generarTurno(){
         return;
     }
 
-    // Guardar en la BASE DE DATOS EN LA NUBE
+    // Guardar en la nube
     await refTurnos.push({
         barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false
     });
@@ -288,11 +312,10 @@ function volver(){
     document.getElementById('selBarbero').value='';
     document.getElementById('selServicio').value='';
     document.getElementById('selFecha').value='';
-    document.getElementById('selHora').innerHTML='<option value="">— Elegí barbero y fecha —</option>';
+    document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
     document.getElementById('inpTel').value='';
 }
 
-// ============== PANEL DE ADMINISTRACIÓN ==============
 function cambiarFiltro(filtro){
     filtroActual = filtro;
     document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
@@ -301,51 +324,53 @@ function cambiarFiltro(filtro){
 }
 
 async function listarTurnos(){
-    const c = document.getElementById('listaTurnos'); c.innerHTML='<p class="cargando">Cargando turnos...</p>';
+    const c = document.getElementById('listaTurnos'); c.innerHTML='<p style="color:#888; text-align:center; padding:20px;">Cargando turnos...</p>';
     
-    const snap = await refTurnos.once('value');
-    const datos = snap.val() || {};
-    let turnos = Object.entries(datos).map(([id, t]) => ({...t, id}));
-    
-    if(turnos.length === 0){
-        c.innerHTML = '<p style="color:#888; font-size:13px; text-align:center; padding:20px;">No hay turnos registrados</p>';
-        return;
+    try {
+        const snap = await refTurnos.once('value');
+        const datos = snap.val() || {};
+        let turnos = Object.entries(datos).map(([id, t]) => ({...t, id}));
+        
+        if(turnos.length === 0){
+            c.innerHTML = '<p style="color:#888; font-size:13px; text-align:center; padding:20px;">No hay turnos registrados</p>';
+            return;
+        }
+
+        turnos = turnos.sort((a,b)=> new Date(b.fecha+'T'+b.hora) - new Date(a.fecha+'T'+a.hora));
+        if(filtroActual === 'pendientes') turnos = turnos.filter(t=>!t.atendido);
+        if(filtroActual === 'atendidos') turnos = turnos.filter(t=>t.atendido);
+
+        c.innerHTML = '';
+        turnos.forEach(t=>{
+            c.innerHTML += `
+                <div class="item ${t.atendido?'atendido':''}">
+                    <div style="flex:1; min-width:200px;">
+                        <strong>${t.nombre}</strong>
+                        ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}
+                        <br><small style="color:#999;">${t.barbero} · ${t.servicio}</small>
+                        <br><small style="color:#d4af37;">📅 ${t.fecha} ⏰ ${t.hora}</small>
+                    </div>
+                    <div class="fila">
+                        ${!t.atendido
+                            ?`<button class="btn-chico-ok" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`
+                            :`<button class="btn-chico-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`
+                        }
+                        <button class="btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (err) {
+        c.innerHTML = '<p style="color:#e74c3c; text-align:center; padding:20px;">❌ Error de conexión. Verificá las reglas de Firebase.</p>';
     }
-
-    turnos = turnos.sort((a,b)=> new Date(b.fecha+'T'+b.hora) - new Date(a.fecha+'T'+a.hora));
-    if(filtroActual === 'pendientes') turnos = turnos.filter(t=>!t.atendido);
-    if(filtroActual === 'atendidos') turnos = turnos.filter(t=>t.atendido);
-
-    c.innerHTML = '';
-    turnos.forEach(t=>{
-        c.innerHTML += `
-            <div class="item ${t.atendido?'atendido':''}">
-                <div style="flex:1; min-width:200px;">
-                    <strong>${t.nombre}</strong>
-                    ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}
-                    <br><small style="color:#999;">${t.barbero} · ${t.servicio}</small>
-                    <br><small style="color:#d4af37;">📅 ${t.fecha} ⏰ ${t.hora}</small>
-                </div>
-                <div class="fila">
-                    ${!t.atendido
-                        ?`<button class="btn-chico-ok" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`
-                        :`<button class="btn-chico-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`
-                    }
-                    <button class="btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button>
-                </div>
-            </div>
-        `;
-    });
 }
 
 async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
 async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); }
 async function borrarTurno(id){ if(!confirm('¿Eliminar este turno definitivamente?')) return; await refTurnos.child(id).remove(); }
 
-// Establecer fecha mínima hoy
 document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
 </script>
 
 </body>
-    </html>
-    
+</html>
