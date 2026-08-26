@@ -63,6 +63,7 @@
         .aviso{color:#ffcc00; font-size:13px; margin-top:8px;}
         .aviso.error{color:#e74c3c;}
         .guardado-ok{color:#2ecc71; font-size:13px; margin-top:8px; display:none;}
+        .cargando{color:#888; text-align:center; padding:15px;}
     </style>
 </head>
 <body>
@@ -82,12 +83,12 @@
         <div id="formRes">
             <label>Barbero *</label>
             <select id="selBarbero" onchange="cargarHorariosDisponibles()">
-                <option value="">— Cargando —</option>
+                <option value="">— Elegí —</option>
             </select>
 
             <label>Servicio *</label>
             <select id="selServicio">
-                <option value="">— Cargando —</option>
+                <option value="">— Elegí —</option>
             </select>
 
             <label>Fecha *</label>
@@ -145,7 +146,7 @@
             <div class="tab" onclick="cambiarTab('ajustes')">⚙️ Ajustes</div>
         </div>
 
-        <!-- TURNOs -->
+        <!-- TURNOS -->
         <div id="tab-turnos">
             <div class="caja">
                 <div class="filtros">
@@ -153,11 +154,11 @@
                     <button class="filtro" onclick="cambiarFiltro('pendientes')">⏳ Pendientes</button>
                     <button class="filtro" onclick="cambiarFiltro('atendidos')">✅ Atendidos</button>
                 </div>
-                <div class="lista" id="listaTurnos"><p style="color:#888; text-align:center; padding:20px;">Cargando turnos...</p></div>
+                <div class="lista" id="listaTurnos"><p class="cargando">Cargando turnos...</p></div>
             </div>
         </div>
 
-        <!-- BARBEROS EDITABLES -->
+        <!-- BARBEROS -->
         <div id="tab-barberos" class="oculto">
             <div class="caja">
                 <h3>Agregar Barbero</h3>
@@ -166,11 +167,11 @@
                 <p class="guardado-ok" id="guardadoBarbero">✅ Guardado en la nube</p>
                 
                 <h3 style="margin-top:25px;">Lista de Barberos</h3>
-                <div id="listaBarberos"><p style="color:#888; padding:10px;">Cargando...</p></div>
+                <div id="listaBarberos"><p class="cargando">Cargando...</p></div>
             </div>
         </div>
 
-        <!-- SERVICIOS EDITABLES -->
+        <!-- SERVICIOS -->
         <div id="tab-servicios" class="oculto">
             <div class="caja">
                 <h3>Agregar Servicio</h3>
@@ -182,11 +183,11 @@
                 <p class="guardado-ok" id="guardadoServicio">✅ Guardado en la nube</p>
                 
                 <h3 style="margin-top:25px;">Lista de Servicios</h3>
-                <div id="listaServicios"><p style="color:#888; padding:10px;">Cargando...</p></div>
+                <div id="listaServicios"><p class="cargando">Cargando...</p></div>
             </div>
         </div>
 
-        <!-- AJUSTES EDITABLES -->
+        <!-- AJUSTES -->
         <div id="tab-ajustes" class="oculto">
             <div class="caja">
                 <h3>⏰ Horarios de Atención</h3>
@@ -232,7 +233,7 @@ const db = firebase.database();
 const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
 
-// CONFIGURACIÓN POR DEFECTO (se guarda en la nube la primera vez)
+// CONFIGURACIÓN POR DEFECTO — SI NO EXISTE EN LA NUBE, USA ESTA
 let config = {
   contrasena: 'admin123',
   whatsapp: '5492984548329',
@@ -250,29 +251,53 @@ let config = {
 
 let filtroActual = 'todos';
 let paginaActual = 'reservar';
+let configCargada = false;
 
-// CARGAR CONFIGURACIÓN DESDE LA NUBE AL INICIAR
-refConfig.on('value', snap => {
-  if(snap.exists()){
-    const nube = snap.val();
-    config = {...config, ...nube};
-  } else {
-    // Primera vez: guardar la configuración inicial
-    refConfig.set(config);
-  }
-  if(paginaActual === 'reservar'){
+// INICIO: CARGAR CONFIGURACIÓN O CREARLA SI NO EXISTE
+async function inicializar(){
+  try {
+    const snap = await refConfig.once('value');
+    if(snap.exists()){
+      const datosNube = snap.val();
+      config = {...config, ...datosNube};
+    } else {
+      // Primera vez: guardar la configuración inicial en la nube
+      await refConfig.set(config);
+    }
+    configCargada = true;
     cargarSelectores();
-    cargarHorariosDisponibles();
+    if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')){
+      listarBarberos();
+      listarServicios();
+      cargarAjustesEnFormulario();
+    }
+  } catch (err) {
+    console.error('Error cargando configuración:', err);
+    cargarSelectores();
   }
-  if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')){
-    listarBarberos();
-    listarServicios();
-    cargarAjustesEnFormulario();
+}
+
+// Escuchar cambios en configuración en tiempo real
+refConfig.on('value', snap => {
+  try {
+    if(snap.exists()){
+      const datosNube = snap.val();
+      config = {...config, ...datosNube};
+    }
+    configCargada = true;
+    if(paginaActual === 'reservar') cargarSelectores();
+    if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')){
+      listarBarberos();
+      listarServicios();
+      cargarAjustesEnFormulario();
+    }
+  } catch (err) {
+    console.error('Error actualizando configuración:', err);
   }
 });
 
 refTurnos.on('value', () => {
-  if(paginaActual === 'reservar') cargarHorariosDisponibles();
+  if(paginaActual === 'reservar' && configCargada) cargarHorariosDisponibles();
   if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')) listarTurnos();
 });
 
@@ -285,7 +310,7 @@ function irA(pagina){
   
   if(pagina==='reservar'){
     document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-    cargarSelectores();
+    if(configCargada) cargarSelectores();
   }
   if(pagina==='admin'){
     document.getElementById('cajaPass').classList.remove('oculto');
@@ -312,12 +337,15 @@ function cambiarTab(nombre){
   event.target.classList.add('activo');
   ['turnos','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
   document.getElementById('tab-'+nombre).classList.remove('oculto');
+  if(nombre === 'ajustes') cargarAjustesEnFormulario();
 }
 
 // --- CARGAR SELECTORES PARA CLIENTES ---
 function cargarSelectores(){
   const selB = document.getElementById('selBarbero');
   const selS = document.getElementById('selServicio');
+  if(!selB || !selS) return;
+  
   selB.innerHTML = '<option value="">— Elegí —</option>';
   selS.innerHTML = '<option value="">— Elegí —</option>';
   
@@ -343,6 +371,8 @@ function generarHorarios(){
 
 // --- CARGAR HORARIOS DISPONIBLES ---
 async function cargarHorariosDisponibles(){
+  if(!configCargada) return;
+  
   const barbero = document.getElementById('selBarbero').value;
   const fecha = document.getElementById('selFecha').value;
   const selH = document.getElementById('selHora');
@@ -431,24 +461,4 @@ async function generarTurno(){
 
   document.getElementById('formRes').classList.add('oculto');
   document.getElementById('confirmado').classList.remove('oculto');
-  document.getElementById('rNombre').textContent = nombre;
-  document.getElementById('rBarbero').textContent = barbero;
-  document.getElementById('rServicio').textContent = servicio;
-  document.getElementById('rFecha').textContent = fecha;
-  document.getElementById('rHora').textContent = hora;
-  document.getElementById('botonWA').href = enlace;
-  document.getElementById('cajaMensaje').textContent = mensaje;
-}
-
-function volver(){
-  document.getElementById('formRes').classList.remove('oculto');
-  document.getElementById('confirmado').classList.add('oculto');
-  document.getElementById('inpNombre').value='';
-  document.getElementById('selBarbero').value='';
-  document.getElementById('selServicio').value='';
-  document.getElementById('selFecha').value='';
-  document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
-  document.getElementById('inpTel').value='';
-}
-
-//
+  document.getElementById('rNombre').textContent = no
