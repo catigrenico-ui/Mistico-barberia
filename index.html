@@ -10,230 +10,72 @@
     <style>
         *{margin:0; padding:0; box-sizing:border-box;}
         :root{
-            --fondo: #050714;
-            --fondoSec: #0F1229;
-            --fondoTarjeta: #141835;
-            --dorado: #D4AF37;
-            --doradoClaro: #F0D78C;
-            --doradoOscuro: #B8962F;
-            --texto: #E8E8F0;
-            --textoSec: #9CA0C2;
-            --borde: rgba(212,175,55,0.15);
-            --exito: #22C55E;
-            --alerta: #EF4444;
-            --whatsapp: #25D366;
+            --fondo: #050714; --fondoSec: #0F1229; --fondoTarjeta: #141835;
+            --dorado: #D4AF37; --doradoClaro: #F0D78C; --doradoOscuro: #B8962F;
+            --texto: #E8E8F0; --textoSec: #9CA0C2; --borde: rgba(212,175,55,0.15);
+            --exito: #22C55E; --alerta: #EF4444; --whatsapp: #25D366;
+            --ganancia: #22C55E; --gasto: #F97316; --inversion: #8B5CF6;
         }
-        body{
-            background: linear-gradient(160deg, var(--fondo) 0%, #0A0E24 100%);
-            color: var(--texto);
-            min-height:100vh;
-            font-family: 'Inter', sans-serif;
-            padding:24px 16px;
-            max-width:560px;
-            margin:0 auto;
-        }
-        .cabecera{
-            text-align:center;
-            padding:28px 20px 32px;
-            margin-bottom:24px;
-            position:relative;
-        }
-        .cabecera::after{
-            content:'';
-            position:absolute;
-            bottom:0; left:50%; transform:translateX(-50%);
-            width:80px; height:3px;
-            background:linear-gradient(90deg, transparent, var(--dorado), transparent);
-            border-radius:3px;
-        }
+        body{background: linear-gradient(160deg, var(--fondo) 0%, #0A0E24 100%); color: var(--texto); min-height:100vh; font-family: 'Inter', sans-serif; padding:24px 16px; max-width:560px; margin:0 auto;}
+        .cabecera{text-align:center; padding:28px 20px 32px; margin-bottom:24px; position:relative;}
+        .cabecera::after{content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:80px; height:3px; background:linear-gradient(90deg, transparent, var(--dorado), transparent); border-radius:3px;}
         .logo{max-width:110px; margin-bottom:12px; filter:drop-shadow(0 0 12px rgba(212,175,55,0.25));}
-        .logo:empty, .logo[src=""], .logo:not([src]){display:none !important;}
-        h1{
-            font-family: 'Playfair Display', serif;
-            color:var(--dorado);
-            font-size:38px;
-            letter-spacing:6px;
-            font-weight:700;
-            text-shadow:0 0 20px rgba(212,175,55,0.15);
-        }
-        .subtitulo{
-            color:var(--textoSec);
-            font-size:14px;
-            letter-spacing:3px;
-            margin-top:6px;
-            text-transform:uppercase;
-        }
-
+        h1{font-family: 'Playfair Display', serif; color:var(--dorado); font-size:38px; letter-spacing:6px; font-weight:700; text-shadow:0 0 20px rgba(212,175,55,0.15);}
+        .subtitulo{color:var(--textoSec); font-size:14px; letter-spacing:3px; margin-top:6px; text-transform:uppercase;}
         .oculto{display:none !important;}
-        .caja{
-            background:var(--fondoTarjeta);
-            padding:28px 24px;
-            border-radius:16px;
-            margin-bottom:20px;
-            border:1px solid var(--borde);
-            box-shadow:0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
-            backdrop-filter:blur(10px);
-        }
-        h2{
-            font-family: 'Playfair Display', serif;
-            color:var(--dorado);
-            font-size:20px;
-            margin-bottom:24px;
-            padding-bottom:12px;
-            border-bottom:1px solid var(--borde);
-            display:flex;
-            align-items:center;
-            gap:10px;
-        }
-        h3{
-            color:var(--doradoClaro);
-            font-size:15px;
-            margin:24px 0 12px;
-            font-weight:600;
-        }
-        
-        label{
-            display:block;
-            margin:18px 0 8px;
-            color:var(--textoSec);
-            font-size:13px;
-            font-weight:500;
-            text-transform:uppercase;
-            letter-spacing:1px;
-        }
-        input, select, button, textarea{
-            width:100%; padding:14px 16px;
-            border:none; border-radius:10px;
-            font-size:15px;
-            font-family:inherit;
-            transition:all 0.25s ease;
-        }
-        input, select, textarea{
-            background:var(--fondoSec);
-            color:var(--texto);
-            border:2px solid transparent;
-            outline:none;
-        }
-        input:focus, select:focus, textarea:focus{
-            border-color:var(--dorado);
-            box-shadow:0 0 0 4px rgba(212,175,55,0.1);
-        }
-        input::placeholder{color:#55597D;}
-        
-        .btn{
-            padding:14px 24px; border:none; border-radius:10px;
-            font-weight:600; cursor:pointer;
-            font-size:15px;
-            letter-spacing:0.5px;
-            transition:all 0.2s ease;
-            font-family:inherit;
-        }
-        .btn:hover{transform:translateY(-1px);}
-        .btn:active{transform:translateY(0);}
-        
-        .btn-dorado{
-            background:linear-gradient(135deg, var(--doradoClaro) 0%, var(--dorado) 50%, var(--doradoOscuro) 100%);
-            color:#000;
-            margin-top:24px;
-            width:100%;
-            box-shadow:0 4px 16px rgba(212,175,55,0.3);
-        }
-        .btn-dorado:hover{box-shadow:0 6px 20px rgba(212,175,55,0.4);}
-        
-        .btn-whatsapp{
-            background:var(--whatsapp);
-            color:#fff;
-            margin-top:20px;
-            width:100%;
-            text-decoration:none;
-            display:block;
-            text-align:center;
-            padding:14px;
-            border-radius:10px;
-            box-shadow:0 4px 16px rgba(37,211,102,0.25);
-        }
-        .btn-whatsapp:hover{background:#20BD5C;}
-        
+        .caja{background:var(--fondoTarjeta); padding:28px 24px; border-radius:16px; margin-bottom:20px; border:1px solid var(--borde); box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+        h2{font-family: 'Playfair Display', serif; color:var(--dorado); font-size:20px; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid var(--borde); display:flex; align-items:center; gap:10px;}
+        h3{color:var(--doradoClaro); font-size:15px; margin:24px 0 12px; font-weight:600;}
+        label{display:block; margin:18px 0 8px; color:var(--textoSec); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:1px;}
+        input, select, button{width:100%; padding:14px 16px; border:none; border-radius:10px; font-size:15px; font-family:inherit;}
+        input, select{background:var(--fondoSec); color:var(--texto); border:2px solid transparent; outline:none;}
+        input:focus, select:focus{border-color:var(--dorado); box-shadow:0 0 0 4px rgba(212,175,55,0.1);}
+        .btn{padding:14px 24px; border:none; border-radius:10px; font-weight:600; cursor:pointer; font-size:15px; transition:all 0.2s ease;}
+        .btn-dorado{background:linear-gradient(135deg, var(--doradoClaro) 0%, var(--dorado) 50%, var(--doradoOscuro) 100%); color:#000; margin-top:24px; width:100%; box-shadow:0 4px 16px rgba(212,175,55,0.3);}
         .btn-rojo{background:var(--alerta); color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
         .btn-verde{background:var(--exito); color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
         .btn-gris{background:#3F425F; color:#fff; padding:8px 12px; font-size:13px; width:auto; border-radius:8px;}
-        .btn-guardar{background:var(--exito); color:#fff; margin-top:20px; width:100%; box-shadow:0 4px 12px rgba(34,197,94,0.25);}
-        
         .fila{display:flex; gap:10px; align-items:center; margin:10px 0; flex-wrap:wrap;}
         .fila-doble{display:flex; gap:12px; flex-wrap:wrap;}
         .fila-doble > *{flex:1; min-width:140px;}
         .lista{margin-top:16px;}
-        .item{
-            display:flex; justify-content:space-between; align-items:center;
-            padding:16px; background:var(--fondoSec); border-radius:12px;
-            margin-bottom:10px; border-left:3px solid var(--dorado);
-            flex-wrap:wrap; gap:10px;
-            transition:all 0.2s ease;
-        }
-        .item:hover{transform:translateX(4px);}
+        .item{display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--fondoSec); border-radius:12px; margin-bottom:10px; border-left:3px solid var(--dorado); flex-wrap:wrap; gap:10px;}
         .item.atendido{border-left-color:var(--exito); opacity:0.7;}
+        .item.ingreso{border-left-color:var(--ganancia);}
+        .item.gasto{border-left-color:var(--gasto);}
+        .item.inversion{border-left-color:var(--inversion);}
         .item-chiquito{padding:12px 14px;}
-        .resumen{
-            background:var(--fondoSec); padding:24px; border-radius:12px;
-            margin:20px 0; line-height:2.2;
-            border:1px solid var(--borde);
-        }
-        .resumen strong{color:var(--dorado); font-weight:600;}
-        .exito{
-            color:var(--exito); font-size:20px; font-weight:700; text-align:center;
-            margin:20px 0; letter-spacing:1px;
-        }
+        .resumen{background:var(--fondoSec); padding:24px; border-radius:12px; margin:20px 0; line-height:2.2; border:1px solid var(--borde);}
+        .caja-resumen{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px;}
+        .tarjeta{background:var(--fondoSec); padding:16px; border-radius:12px; text-align:center; border:1px solid var(--borde);}
+        .tarjeta.ingreso{border-color:var(--ganancia); background:rgba(34,197,94,0.08);}
+        .tarjeta.gasto{border-color:var(--gasto); background:rgba(249,115,22,0.08);}
+        .tarjeta.inversion{border-color:var(--inversion); background:rgba(139,92,246,0.08);}
+        .tarjeta .monto{font-size:20px; font-weight:700; margin-top:4px;}
+        .tarjeta.ingreso .monto{color:var(--ganancia);}
+        .tarjeta.gasto .monto{color:var(--gasto);}
+        .tarjeta.inversion .monto{color:var(--inversion);}
+        .exito{color:var(--exito); font-size:20px; font-weight:700; text-align:center; margin:20px 0;}
         .pass-box{max-width:340px; margin:0 auto; text-align:center;}
-        .etiqueta-atendido{
-            background:var(--exito); color:#fff; font-size:11px;
-            padding:3px 10px; border-radius:20px; margin-left:10px;
-            font-weight:600;
-        }
+        .etiqueta-atendido{background:var(--exito); color:#fff; font-size:11px; padding:3px 10px; border-radius:20px; margin-left:10px; font-weight:600;}
         .filtros{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
-        .filtro{
-            padding:8px 16px; background:transparent; border:1px solid #3F425F;
-            color:var(--textoSec); border-radius:20px; font-size:13px;
-            cursor:pointer; width:auto; font-weight:500;
-            transition:all 0.2s ease;
-        }
-        .filtro.activo{
-            border-color:var(--dorado); color:var(--doradoClaro);
-            background:rgba(212,175,55,0.1);
-        }
-        .tabs{
-            display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--borde);
-            flex-wrap:wrap;
-        }
-        .tab{
-            padding:12px 16px; color:var(--textoSec); cursor:pointer;
-            border-bottom:2px solid transparent; font-size:14px;
-            font-weight:500; transition:all 0.2s ease;
-        }
+        .filtro{padding:8px 16px; background:transparent; border:1px solid #3F425F; color:var(--textoSec); border-radius:20px; font-size:13px; cursor:pointer; font-weight:500;}
+        .filtro.activo{border-color:var(--dorado); color:var(--doradoClaro); background:rgba(212,175,55,0.1);}
+        .tabs{display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--borde); flex-wrap:wrap; overflow-x:auto;}
+        .tab{padding:12px 12px; color:var(--textoSec); cursor:pointer; border-bottom:2px solid transparent; font-size:13px; font-weight:500; white-space:nowrap;}
         .tab.activo{color:var(--doradoClaro); border-bottom-color:var(--dorado);}
-        
-        .btn-admin-flotante{
-            position:fixed; top:16px; right:16px; background:var(--fondoTarjeta);
-            border:1px solid var(--borde); color:var(--dorado); font-size:20px;
-            width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            cursor:pointer; z-index:100; padding:0; box-shadow:0 4px 16px rgba(0,0,0,0.4);
-            transition:all 0.2s ease;
-        }
-        .btn-admin-flotante:hover{background:rgba(212,175,55,0.1); transform:scale(1.1);}
-        
-        .mensaje-caja{
-            background:var(--fondoSec); padding:16px; border-radius:10px;
-            margin-top:16px; border:1px solid rgba(37,211,102,0.3);
-            white-space:pre-wrap; font-size:13px; color:#B8F0C8;
-            line-height:1.8;
-        }
-        .aviso{color:#FBBF24; font-size:13px; margin-top:10px; display:flex; align-items:center; gap:6px;}
+        .btn-admin-flotante{position:fixed; top:16px; right:16px; background:var(--fondoTarjeta); border:1px solid var(--borde); color:var(--dorado); font-size:20px; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100; box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+        .btn-admin-flotante:hover{background:rgba(212,175,55,0.1);}
+        .btn-whatsapp{background:var(--whatsapp); color:#fff; margin-top:20px; width:100%; text-decoration:none; display:block; text-align:center; padding:14px; border-radius:10px;}
+        .mensaje-caja{background:var(--fondoSec); padding:16px; border-radius:10px; margin-top:16px; border:1px solid rgba(37,211,102,0.3); white-space:pre-wrap; font-size:13px; color:#B8F0C8; line-height:1.8;}
+        .aviso{color:#FBBF24; font-size:13px; margin-top:10px;}
         .aviso.error{color:var(--alerta);}
-        .guardado-ok{
-            color:var(--exito); font-size:13px; margin-top:10px; display:none;
-            font-weight:500;
-        }
+        .guardado-ok{color:var(--exito); font-size:13px; margin-top:10px; display:none; font-weight:500;}
         .divisor{height:1px; background:linear-gradient(90deg, transparent, var(--borde), transparent); margin:24px 0;}
         .info-horario{background:rgba(212,175,55,0.08); border:1px dashed var(--dorado); border-radius:10px; padding:12px; margin-top:12px; font-size:13px; color:var(--doradoClaro);}
+        .balance-final{text-align:center; padding:20px; border-radius:12px; margin-top:16px; background:linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05)); border:2px solid var(--ganancia);}
+        .balance-final .monto-total{font-size:28px; font-weight:700; color:var(--ganancia);}
+        .auto-ingreso{font-size:11px; color:var(--exito); margin-left:8px; background:rgba(34,197,94,0.15); padding:2px 8px; border-radius:10px;}
     </style>
 </head>
 <body>
@@ -253,16 +95,11 @@
             <label>Barbero</label>
             <select id="selBarbero" onchange="cargarHorariosDisponibles()">
                 <option value="">— Seleccionar —</option>
-                <option value="Nico">Nico</option>
             </select>
 
             <label>Servicio</label>
             <select id="selServicio">
                 <option value="">— Seleccionar —</option>
-                <option value="Corte de cabello — $5.000">Corte de cabello — $5.000</option>
-                <option value="Arreglo de barba — $3.500">Arreglo de barba — $3.500</option>
-                <option value="Corte + Barba — $7.500">Corte + Barba — $7.500</option>
-                <option value="Afeitado clásico — $4.000">Afeitado clásico — $4.000</option>
             </select>
 
             <label>Fecha</label>
@@ -295,12 +132,9 @@
                 <strong>Fecha:</strong> <span id="rFecha"></span><br>
                 <strong>Hora:</strong> <span id="rHora"></span>
             </div>
-            
-            <a id="botonWA" class="btn-whatsapp" href="" target="_blank" rel="noopener noreferrer">💬 ENVIAR POR WHATSAPP</a>
-            
-            <p style="color:var(--textoSec); font-size:12px; text-align:center; margin:16px 0 8px;">Si no abre, copiá y mandá este mensaje:</p>
+            <a id="botonWA" class="btn-whatsapp" href="" target="_blank">💬 ENVIAR POR WHATSAPP</a>
+            <p style="color:var(--textoSec); font-size:12px; text-align:center; margin:16px 0 8px;">Mensaje para copiar:</p>
             <div class="mensaje-caja" id="cajaMensaje"></div>
-            
             <button class="btn btn-gris" style="width:100%; margin-top:20px;" onclick="volver()">🔄 Reservar otro turno</button>
         </div>
     </div>
@@ -312,12 +146,13 @@
         <p style="text-align:center; color:var(--textoSec); margin-bottom:20px; font-size:14px;">Ingresá tu contraseña para continuar</p>
         <input type="password" id="passAdmin" placeholder="Contraseña">
         <button class="btn btn-dorado" onclick="ingresar()">Ingresar</button>
-        <button class="btn btn-gris" style="margin-top:12px; width:auto; display:block; margin-left:auto; margin-right:auto;" onclick="irA('reservar')">← Volver</button>
+        <button class="btn btn-gris" style="margin-top:12px; display:block; margin:auto;" onclick="irA('reservar')">← Volver</button>
     </div>
 
     <div id="panelConfig" class="oculto">
         <div class="tabs">
             <div class="tab activo" onclick="cambiarTab('turnos')">📋 Turnos</div>
+            <div class="tab" onclick="cambiarTab('finanzas')">💰 Finanzas</div>
             <div class="tab" onclick="cambiarTab('barberos')">🧑‍💼 Barberos</div>
             <div class="tab" onclick="cambiarTab('servicios')">💇 Servicios</div>
             <div class="tab" onclick="cambiarTab('ajustes')">⚙️ Ajustes</div>
@@ -334,13 +169,50 @@
             </div>
         </div>
 
+        <div id="tab-finanzas" class="oculto">
+            <div class="caja">
+                <h2>💰 Finanzas — Ganancias / Gastos / Inversión</h2>
+                <div class="caja-resumen">
+                    <div class="tarjeta ingreso"><div style="font-size:13px; color:var(--textoSec);">Ganancias</div><div class="monto" id="totalIngresos">$0</div></div>
+                    <div class="tarjeta gasto"><div style="font-size:13px; color:var(--textoSec);">Gastos</div><div class="monto" id="totalGastos">$0</div></div>
+                    <div class="tarjeta inversion"><div style="font-size:13px; color:var(--textoSec);">Inversión</div><div class="monto" id="totalInversion">$0</div></div>
+                </div>
+                <div class="balance-final"><h4>💵 SALDO ACTUAL</h4><div class="monto-total" id="saldoTotal">$0</div></div>
+                <div class="divisor"></div>
+                <h3>➕ Agregar Movimiento Manual</h3>
+                <label>Tipo</label>
+                <select id="tipoMov">
+                    <option value="ingreso">🟢 Ganancia / Ingreso</option>
+                    <option value="gasto">🟠 Gasto</option>
+                    <option value="inversion">🟣 Inversión</option>
+                </select>
+                <label>Descripción</label>
+                <input type="text" id="descMov" placeholder="Ej: Productos, Alquiler, Herramientas...">
+                <label>Monto $</label>
+                <input type="number" id="montoMov" placeholder="0" min="1">
+                <label>Fecha</label>
+                <input type="date" id="fechaMov">
+                <button class="btn btn-dorado" onclick="agregarMovimiento()">💾 GUARDAR MOVIMIENTO</button>
+                <p class="guardado-ok" id="guardadoMov">✅ Guardado en la nube</p>
+                <div class="divisor"></div>
+                <h3>📊 Historial de Movimientos</h3>
+                <p style="font-size:12px; color:var(--textoSec); margin-bottom:12px;">🟢 = Automático por turno atendido | Agregados manualmente</p>
+                <div class="filtros">
+                    <button class="filtro activo" onclick="cambiarFiltroMov('todos')">Todos</button>
+                    <button class="filtro" onclick="cambiarFiltroMov('ingreso')">🟢 Ganancias</button>
+                    <button class="filtro" onclick="cambiarFiltroMov('gasto')">🟠 Gastos</button>
+                    <button class="filtro" onclick="cambiarFiltroMov('inversion')">🟣 Inversiones</button>
+                </div>
+                <div class="lista" id="listaMovimientos"><p style="color:var(--textoSec); text-align:center; padding:30px;">Sin movimientos registrados</p></div>
+            </div>
+        </div>
+
         <div id="tab-barberos" class="oculto">
             <div class="caja">
                 <h3>Agregar Nuevo Barbero</h3>
                 <input type="text" id="nuevoBarbero" placeholder="Nombre del barbero">
                 <button class="btn btn-dorado" onclick="agregarBarbero()">➕ Agregar</button>
-                <p class="guardado-ok" id="guardadoBarbero">✅ Guardado en la nube — Actualizado en todos los dispositivos</p>
-                
+                <p class="guardado-ok" id="guardadoBarbero">✅ Guardado</p>
                 <h3>Lista de Barberos</h3>
                 <div id="listaBarberos"><p style="color:var(--textoSec); padding:10px;">Cargando...</p></div>
             </div>
@@ -351,11 +223,10 @@
                 <h3>Agregar Nuevo Servicio</h3>
                 <div class="fila-doble">
                     <input type="text" id="nuevoServicio" placeholder="Nombre del servicio">
-                    <input type="number" id="precioServicio" placeholder="Precio $" style="width:120px;">
+                    <input type="number" id="precioServicio" placeholder="Precio $">
                 </div>
                 <button class="btn btn-dorado" onclick="agregarServicio()">➕ Agregar</button>
-                <p class="guardado-ok" id="guardadoServicio">✅ Guardado en la nube — Actualizado en todos los dispositivos</p>
-                
+                <p class="guardado-ok" id="guardadoServicio">✅ Guardado</p>
                 <h3>Lista de Servicios</h3>
                 <div id="listaServicios"><p style="color:var(--textoSec); padding:10px;">Cargando...</p></div>
             </div>
@@ -363,40 +234,23 @@
 
         <div id="tab-ajustes" class="oculto">
             <div class="caja">
-                <h3>⏰ Horario de Atención (Horario Partido / Cortado)</h3>
-                <p class="info-horario">🕒 Mañana → desde las <strong>hora inicio</strong> hasta las <strong>hora fin mañana</strong><br>
-                🌅 Tarde → desde las <strong>hora inicio tarde</strong> hasta las <strong>hora fin tarde</strong><br>
-                ⏸️ El horario entre el fin de mañana y el inicio de tarde queda <strong>cerrado</strong></p>
-                
-                <label>Hora inicio mañana</label>
-                <input type="time" id="horaInicioManana" value="09:00">
-                <label>Hora fin mañana</label>
-                <input type="time" id="horaFinManana" value="13:00">
-                
+                <h3>⏰ Horario de Atención</h3>
+                <p class="info-horario">Mañana: desde hora inicio hasta hora fin<br>Tarde: desde hora inicio tarde hasta hora fin tarde</p>
+                <label>Hora inicio mañana</label><input type="time" id="horaInicioManana" value="09:00">
+                <label>Hora fin mañana</label><input type="time" id="horaFinManana" value="13:00">
+                <label>Hora inicio tarde</label><input type="time" id="horaInicioTarde" value="16:00">
+                <label>Hora fin tarde</label><input type="time" id="horaFinTarde" value="21:00">
+                <label>Intervalo entre turnos (minutos)</label><input type="number" id="intervaloMin" value="30" min="15" step="15">
                 <div class="divisor"></div>
-                
-                <label>Hora inicio tarde</label>
-                <input type="time" id="horaInicioTarde" value="16:00">
-                <label>Hora fin tarde</label>
-                <input type="time" id="horaFinTarde" value="21:00">
-                
-                <label>Intervalo entre turnos (minutos)</label>
-                <input type="number" id="intervaloMin" value="30" min="15" step="15">
-
-                <div class="divisor"></div>
-
                 <h3>🔒 Seguridad y Contacto</h3>
-                <label>WhatsApp de la Barbería</label>
-                <input type="tel" id="waBarberia" value="5492984548329" placeholder="549...">
-                <label>Nueva Contraseña de Administración</label>
-                <input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
-
-                <button class="btn btn-guardar" onclick="guardarAjustes()">💾 GUARDAR TODOS LOS CAMBIOS</button>
-                <p class="guardado-ok" id="guardadoAjustes">✅ Guardado en la nube — Todos los dispositivos actualizados</p>
+                <label>WhatsApp de la Barbería</label><input type="tel" id="waBarberia" value="5492984548329">
+                <label>Nueva Contraseña</label><input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
+                <button class="btn btn-dorado" onclick="guardarAjustes()">💾 GUARDAR AJUSTES</button>
+                <p class="guardado-ok" id="guardadoAjustes">✅ Guardado</p>
             </div>
         </div>
 
-        <button class="btn btn-gris" style="margin-top:16px; width:auto; display:block; margin-left:auto; margin-right:auto;" onclick="irA('reservar')">← Volver a Reservas</button>
+        <button class="btn btn-gris" style="margin-top:16px; display:block; margin:auto;" onclick="irA('reservar')">← Volver a Reservas</button>
     </div>
 </div>
 
@@ -418,6 +272,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
+const refMovimientos = db.ref('movimientos');
 
 let config = {
   contrasena: 'admin123',
@@ -436,32 +291,29 @@ let config = {
   ]
 };
 
-let filtroActual = 'todos';
-let paginaActual = 'reservar';
+let filtroActual = 'todos', filtroMovActual = 'todos', paginaActual = 'reservar';
 
 refConfig.on('value', snap => {
-  if(snap.exists()){
-    const datos = snap.val();
-    config = {...config, ...datos};
-    actualizarSelectores();
-  }
+  if(snap.exists()){ config = {...config, ...snap.val()}; }
+  actualizarSelectores();
 });
 
 refTurnos.on('value', () => {
-  // ✅ SOLO cargar horarios si estamos EN la página de reservas
-  if(paginaActual === 'reservar') cargarHorariosDisponibles();
-  // ✅ SOLO listar turnos si estamos en admin y ya ingresamos
   if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')) listarTurnos();
+});
+
+refMovimientos.on('value', () => {
+  if(paginaActual === 'admin' && !document.getElementById('panelConfig').classList.contains('oculto')){
+    calcularTotales(); listarMovimientos();
+  }
 });
 
 function actualizarSelectores(){
   const selB = document.getElementById('selBarbero');
   const selS = document.getElementById('selServicio');
   if(!selB || !selS) return;
-  
   selB.innerHTML = '<option value="">— Seleccionar —</option>';
   selS.innerHTML = '<option value="">— Seleccionar —</option>';
-  
   config.barberos.forEach(b => selB.innerHTML += `<option value="${b}">${b}</option>`);
   config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre} — $${s.precio.toLocaleString('es-AR')}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
 }
@@ -471,7 +323,6 @@ function irA(pagina){
   document.getElementById('reservar').classList.add('oculto');
   document.getElementById('admin').classList.add('oculto');
   document.getElementById(pagina).classList.remove('oculto');
-  
   if(pagina==='reservar'){
     document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
     actualizarSelectores();
@@ -487,135 +338,87 @@ function ingresar(){
     document.getElementById('cajaPass').classList.add('oculto');
     document.getElementById('panelConfig').classList.remove('oculto');
     cambiarTab('turnos');
-    listarTurnos();
-    listarBarberos();
-    listarServicios();
-    cargarAjustesEnFormulario();
-  }else{
-    alert('❌ Contraseña incorrecta');
-  }
+    listarTurnos(); listarBarberos(); listarServicios(); cargarAjustesEnFormulario();
+    document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0];
+  }else{ alert('❌ Contraseña incorrecta'); }
 }
 
 function cambiarTab(nombre){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
   event.target.classList.add('activo');
-  ['turnos','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
+  ['turnos','finanzas','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
   document.getElementById('tab-'+nombre).classList.remove('oculto');
   if(nombre === 'ajustes') cargarAjustesEnFormulario();
+  if(nombre === 'finanzas'){ calcularTotales(); listarMovimientos(); document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0]; }
 }
 
 function generarHorarios(){
   const horarios = [];
-  
   let [hIM, mIM] = config.horaInicioManana.split(':').map(Number);
   let [hFM, mFM] = config.horaFinManana.split(':').map(Number);
-  let actualMañana = hIM * 60 + mIM;
-  const finMañana = hFM * 60 + mFM;
-  
-  while(actualMañana <= finMañana){
-    const hh = Math.floor(actualMañana / 60);
-    const mm = (actualMañana % 60).toString().padStart(2,'0');
-    horarios.push(`${hh}:${mm}`);
-    actualMañana += config.intervalo;
+  let actual = hIM * 60 + mIM, fin = hFM * 60 + mFM;
+  while(actual <= fin){
+    const hh = Math.floor(actual/60), mm = (actual%60).toString().padStart(2,'0');
+    horarios.push(`${hh}:${mm}`); actual += config.intervalo;
   }
-  
   let [hIT, mIT] = config.horaInicioTarde.split(':').map(Number);
   let [hFT, mFT] = config.horaFinTarde.split(':').map(Number);
-  let actualTarde = hIT * 60 + mIT;
-  const finTarde = hFT * 60 + mFT;
-  
-  while(actualTarde <= finTarde){
-    const hh = Math.floor(actualTarde / 60);
-    const mm = (actualTarde % 60).toString().padStart(2,'0');
-    horarios.push(`${hh}:${mm}`);
-    actualTarde += config.intervalo;
+  actual = hIT * 60 + mIT; fin = hFT * 60 + mFT;
+  while(actual <= fin){
+    const hh = Math.floor(actual/60), mm = (actual%60).toString().padStart(2,'0');
+    horarios.push(`${hh}:${mm}`); actual += config.intervalo;
   }
-  
   return horarios;
 }
 
 async function cargarHorariosDisponibles(){
-  // ✅ Si NO estamos en la página de reservas, NO hacemos nada
   if(paginaActual !== 'reservar') return;
-
   const barbero = document.getElementById('selBarbero').value;
   const fecha = document.getElementById('selFecha').value;
   const selH = document.getElementById('selHora');
   const aviso = document.getElementById('avisoHorario');
-  
   selH.innerHTML = '<option value="">— Elegí horario —</option>';
   aviso.classList.add('oculto');
-  
   if(!barbero || !fecha) return;
-
-  aviso.classList.remove('oculto');
-  aviso.textContent = '⏳ Cargando horarios...';
-
+  aviso.classList.remove('oculto'); aviso.textContent = '⏳ Cargando...';
   try {
     const snap = await refTurnos.once('value');
-    const todosTurnos = snap.val() || {};
-    const ocupados = Object.values(todosTurnos)
-      .filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha)
-      .map(t => t.hora);
-
+    const todos = snap.val() || {};
+    const ocupados = Object.values(todos).filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha).map(t => t.hora);
     const HORARIOS = generarHorarios();
-    let hayDisponibles = false;
-    HORARIOS.forEach(hora => {
-      if(!ocupados.includes(hora)){
-        selH.innerHTML += `<option value="${hora}">${hora}</option>`;
-        hayDisponibles = true;
-      }
-    });
-
-    if(!hayDisponibles) selH.innerHTML = '<option value="">❌ No hay horarios disponibles ese día</option>';
-    aviso.textContent = hayDisponibles ? '✅ Horarios cargados' : '⚠️ No hay turnos libres ese día';
+    let hay = false;
+    HORARIOS.forEach(h => { if(!ocupados.includes(h)){ selH.innerHTML += `<option value="${h}">${h}</option>`; hay = true; } });
+    if(!hay) selH.innerHTML = '<option value="">❌ No hay horarios disponibles</option>';
+    aviso.textContent = hay ? '✅ Cargados' : '⚠️ Sin turnos libres';
     setTimeout(() => aviso.classList.add('oculto'), 2500);
-  } catch (error) {
-    aviso.textContent = '❌ Sin conexión. Probá más tarde.';
-    aviso.classList.add('error');
-  }
+  } catch { aviso.textContent = '❌ Error de conexión'; aviso.classList.add('error'); }
 }
 
 async function generarTurno(){
   const nombre = document.getElementById('inpNombre').value.trim();
   const barbero = document.getElementById('selBarbero').value;
-  const servicio = document.getElementById('selServicio').value;
+  const servicioCompleto = document.getElementById('selServicio').value;
+  const servicio = servicioCompleto.split(' — $')[0];
   const fecha = document.getElementById('selFecha').value;
   const hora = document.getElementById('selHora').value;
   const tel = document.getElementById('inpTel').value.trim();
-
-  if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){
-    alert('⚠️ Completá todos los campos'); return;
-  }
-  if(hora.includes('❌') || hora === ''){
-    alert('⚠️ Elegí un horario válido'); return;
-  }
-
+  if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){ alert('⚠️ Completá todos los campos'); return; }
+  if(hora.includes('❌') || hora === ''){ alert('⚠️ Elegí un horario válido'); return; }
   const snap = await refTurnos.once('value');
-  const todosTurnos = snap.val() || {};
-  const yaOcupado = Object.values(todosTurnos).some(t => !t.atendido && t.barbero === barbero && t.fecha === fecha && t.hora === hora);
-  
-  if(yaOcupado){
-    alert('❌ ¡Ese horario acaba de ser reservado! Elegí otro.');
-    cargarHorariosDisponibles();
-    return;
-  }
-
+  const todos = snap.val() || {};
+  const ocupado = Object.values(todos).some(t => !t.atendido && t.barbero === barbero && t.fecha === fecha && t.hora === hora);
+  if(ocupado){ alert('❌ ¡Ese horario ya fue reservado! Elegí otro.'); cargarHorariosDisponibles(); return; }
   await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, atendido:false});
-
   const mensaje = `Hola! Quisiera reservar un turno en MÍSTICO:
 
 👤 Nombre: ${nombre}
-📞 Mi WhatsApp: ${tel}
+📞 WhatsApp: ${tel}
 ✂️ Barbero: ${barbero}
 💇 Servicio: ${servicio}
 📅 Fecha: ${fecha}
 ⏰ Hora: ${hora}
 
 ¡Gracias!`;
-
-  const enlace = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
-
   document.getElementById('formRes').classList.add('oculto');
   document.getElementById('confirmado').classList.remove('oculto');
   document.getElementById('rNombre').textContent = nombre;
@@ -623,7 +426,7 @@ async function generarTurno(){
   document.getElementById('rServicio').textContent = servicio;
   document.getElementById('rFecha').textContent = fecha;
   document.getElementById('rHora').textContent = hora;
-  document.getElementById('botonWA').href = enlace;
+  document.getElementById('botonWA').href = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
   document.getElementById('cajaMensaje').textContent = mensaje;
 }
 
@@ -638,142 +441,175 @@ function volver(){
   document.getElementById('inpTel').value='';
 }
 
-function cambiarFiltro(filtro){
-  filtroActual = filtro;
-  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
-  event.target.classList.add('activo');
-  listarTurnos();
+function cambiarFiltro(f){ filtroActual = f; document.querySelectorAll('#tab-turnos .filtro').forEach(b=>b.classList.remove('activo')); event.target.classList.add('activo'); listarTurnos(); }
+
+function obtenerPrecioServicio(nombreServicio){
+  const serv = config.servicios.find(s => s.nombre === nombreServicio);
+  return serv ? serv.precio : 0;
 }
 
-async function listarTurnos(){
-  const c = document.getElementById('listaTurnos'); c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">Cargando turnos...</p>';
-  
-  try {
-    const snap = await refTurnos.once('value');
-    const datos = snap.val() || {};
-    let turnos = Object.entries(datos).map(([id, t]) => ({...t, id}));
-    
-    if(turnos.length === 0){
-      c.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:30px;">No hay turnos registrados</p>';
-      return;
-    }
-
-    turnos = turnos.sort((a,b)=> new Date(b.fecha+'T'+b.hora) - new Date(a.fecha+'T'+a.hora));
-    if(filtroActual === 'pendientes') turnos = turnos.filter(t=>!t.atendido);
-    if(filtroActual === 'atendidos') turnos = turnos.filter(t=>t.atendido);
-
-    c.innerHTML = '';
-    turnos.forEach(t=>{
-      c.innerHTML += `
-        <div class="item ${t.atendido?'atendido':''}">
-            <div style="flex:1; min-width:200px;">
-                <strong style="color:var(--texto); font-size:15px;">${t.nombre}</strong>
-                ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}
-                <br><small style="color:var(--textoSec);">${t.barbero} · ${t.servicio}</small>
-                <br><small style="color:var(--doradoClaro);">📅 ${t.fecha} ⏰ ${t.hora}</small>
-            </div>
-            <div class="fila">
-                ${!t.atendido
-                    ?`<button class="btn btn-verde" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`
-                    :`<button class="btn btn-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`
-                }
-                <button class="btn btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button>
-            </div>
-        </div>
-      `;
+async function marcarAtendido(id, turno){
+  await refTurnos.child(id).update({atendido:true});
+  const precio = obtenerPrecioServicio(turno.servicio);
+  if(precio > 0){
+    await refMovimientos.push({
+      tipo: 'ingreso',
+      descripcion: `✅ ${turno.servicio} — ${turno.nombre} (${turno.barbero})`,
+      monto: precio,
+      fecha: turno.fecha,
+      auto: true,
+      turnoId: id
     });
-  } catch (err) {
-    c.innerHTML = '<p style="color:var(--alerta); text-align:center; padding:30px;">❌ Error cargando turnos</p>';
   }
 }
 
-async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
-async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); }
-async function borrarTurno(id){ if(!confirm('¿Eliminar este turno definitivamente?')) return; await refTurnos.child(id).remove(); }
+async function desmarcarAtendido(id, turno){
+  await refTurnos.child(id).update({atendido:false});
+  const snap = await refMovimientos.once('value');
+  const movs = snap.val() || {};
+  for(const [mid, m] of Object.entries(movs)){
+    if(m.turnoId === id && m.auto === true){
+      await refMovimientos.child(mid).remove();
+      break;
+    }
+  }
+}
+
+async function listarTurnos(){
+  const c = document.getElementById('listaTurnos'); c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">Cargando...</p>';
+  try {
+    const snap = await refTurnos.once('value');
+    const datos = snap.val() || {};
+    let turnos = Object.entries(datos).map(([id,t])=>({...t,id}));
+    if(turnos.length===0){ c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">No hay turnos</p>'; return; }
+    turnos.sort((a,b)=>new Date(b.fecha+'T'+b.hora)-new Date(a.fecha+'T'+a.hora));
+    if(filtroActual==='pendientes') turnos=turnos.filter(t=>!t.atendido);
+    if(filtroActual==='atendidos') turnos=turnos.filter(t=>t.atendido);
+    c.innerHTML='';
+    turnos.forEach(t=>{
+      const precio = obtenerPrecioServicio(t.servicio);
+      c.innerHTML += `<div class="item ${t.atendido?'atendido':''}">
+        <div style="flex:1; min-width:200px;"><strong>${t.nombre}</strong>${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br><small style="color:var(--textoSec);">${t.barbero} · ${t.servicio}${precio>0?' — $'+precio.toLocaleString('es-AR'):''}</small><br><small style="color:var(--doradoClaro);">📅 ${t.fecha} ⏰ ${t.hora}</small></div>
+        <div class="fila">${!t.atendido?`<button class="btn btn-verde" onclick="marcarAtendido('${t.id}', ${JSON.stringify(t).replace(/"/g,'&quot;')})">✅ Atendido 💰</button>`:`<button class="btn btn-gris" onclick="desmarcarAtendido('${t.id}', ${JSON.stringify(t).replace(/"/g,'&quot;')})">↩️ Deshacer</button>`}<button class="btn btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button></div>
+      </div>`;
+    });
+  } catch { c.innerHTML='<p style="color:var(--alerta); text-align:center; padding:30px;">❌ Error</p>'; }
+}
+
+async function borrarTurno(id){
+  if(!confirm('¿Eliminar este turno? Si ya estaba marcado como atendido, el ingreso también se eliminará')) return;
+  const snap = await refTurnos.child(id).once('value');
+  const turno = snap.val();
+  if(turno && turno.atendido){
+    const snapMov = await refMovimientos.once('value');
+    const movs = snapMov.val() || {};
+    for(const [mid, m] of Object.entries(movs)){
+      if(m.turnoId === id && m.auto === true){
+        await refMovimientos.child(mid).remove();
+        break;
+      }
+    }
+  }
+  await refTurnos.child(id).remove();
+}
 
 async function agregarBarbero(){
   const nom = document.getElementById('nuevoBarbero').value.trim();
   if(!nom || config.barberos.includes(nom)) return;
-  config.barberos.push(nom);
-  await refConfig.update({barberos: config.barberos});
-  document.getElementById('nuevoBarbero').value='';
-  document.getElementById('guardadoBarbero').style.display='block';
-  setTimeout(()=>document.getElementById('guardadoBarbero').style.display='none',3000);
-  listarBarberos();
+  config.barberos.push(nom); await refConfig.update({barberos:config.barberos});
+  document.getElementById('nuevoBarbero').value=''; document.getElementById('guardadoBarbero').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoBarbero').style.display='none',3000); listarBarberos();
 }
 
-async function eliminarBarbero(nom){
-  if(!confirm(`¿Eliminar a "${nom}"? No afecta los turnos ya reservados`)) return;
-  config.barberos = config.barberos.filter(b=>b!==nom);
-  await refConfig.update({barberos: config.barberos});
-  listarBarberos();
-}
-
-function listarBarberos(){
-  const c = document.getElementById('listaBarberos'); c.innerHTML='';
-  config.barberos.forEach(b=>{
-    c.innerHTML += `<div class="item item-chiquito"><span>${b}</span><button class="btn btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`;
-  });
-}
+async function eliminarBarbero(n){ if(!confirm(`¿Eliminar a "${n}"?`)) return; config.barberos=config.barberos.filter(b=>b!==n); await refConfig.update({barberos:config.barberos}); listarBarberos(); }
+function listarBarberos(){ const c=document.getElementById('listaBarberos'); c.innerHTML=''; config.barberos.forEach(b=>c.innerHTML+=`<div class="item item-chiquito"><span>${b}</span><button class="btn btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`); }
 
 async function agregarServicio(){
   const nom = document.getElementById('nuevoServicio').value.trim();
   const pre = parseInt(document.getElementById('precioServicio').value);
-  if(!nom || !pre) return;
-  config.servicios.push({nombre:nom, precio:pre});
-  await refConfig.update({servicios: config.servicios});
-  document.getElementById('nuevoServicio').value='';
-  document.getElementById('precioServicio').value='';
-  document.getElementById('guardadoServicio').style.display='block';
-  setTimeout(()=>document.getElementById('guardadoServicio').style.display='none',3000);
-  listarServicios();
+  if(!nom||!pre) return; config.servicios.push({nombre:nom,precio:pre}); await refConfig.update({servicios:config.servicios});
+  document.getElementById('nuevoServicio').value=''; document.getElementById('precioServicio').value=''; document.getElementById('guardadoServicio').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoServicio').style.display='none',3000); listarServicios();
 }
 
-async function eliminarServicio(indice){
-  if(!confirm('¿Eliminar este servicio? No afecta los turnos ya reservados')) return;
-  config.servicios.splice(indice,1);
-  await refConfig.update({servicios: config.servicios});
-  listarServicios();
-}
-
-function listarServicios(){
-  const c = document.getElementById('listaServicios'); c.innerHTML='';
-  config.servicios.forEach((s,i)=>{
-    c.innerHTML += `<div class="item item-chiquito"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`;
-  });
-}
+async function eliminarServicio(i){ if(!confirm('¿Eliminar servicio?')) return; config.servicios.splice(i,1); await refConfig.update({servicios:config.servicios}); listarServicios(); }
+function listarServicios(){ const c=document.getElementById('listaServicios'); c.innerHTML=''; config.servicios.forEach((s,i)=>c.innerHTML+=`<div class="item item-chiquito"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`); }
 
 function cargarAjustesEnFormulario(){
-  document.getElementById('horaInicioManana').value = config.horaInicioManana;
-  document.getElementById('horaFinManana').value = config.horaFinManana;
-  document.getElementById('horaInicioTarde').value = config.horaInicioTarde;
-  document.getElementById('horaFinTarde').value = config.horaFinTarde;
-  document.getElementById('intervaloMin').value = config.intervalo;
-  document.getElementById('waBarberia').value = config.whatsapp;
-  document.getElementById('nuevaPass').value = '';
+  document.getElementById('horaInicioManana').value=config.horaInicioManana;
+  document.getElementById('horaFinManana').value=config.horaFinManana;
+  document.getElementById('horaInicioTarde').value=config.horaInicioTarde;
+  document.getElementById('horaFinTarde').value=config.horaFinTarde;
+  document.getElementById('intervaloMin').value=config.intervalo;
+  document.getElementById('waBarberia').value=config.whatsapp;
 }
 
 async function guardarAjustes(){
-  const nuevos = {
-    horaInicioManana: document.getElementById('horaInicioManana').value,
-    horaFinManana: document.getElementById('horaFinManana').value,
-    horaInicioTarde: document.getElementById('horaInicioTarde').value,
-    horaFinTarde: document.getElementById('horaFinTarde').value,
-    intervalo: parseInt(document.getElementById('intervaloMin').value),
-    whatsapp: document.getElementById('waBarberia').value.trim()
-  };
+  config.horaInicioManana = document.getElementById('horaInicioManana').value;
+  config.horaFinManana = document.getElementById('horaFinManana').value;
+  config.horaInicioTarde = document.getElementById('horaInicioTarde').value;
+  config.horaFinTarde = document.getElementById('horaFinTarde').value;
+  config.intervalo = parseInt(document.getElementById('intervaloMin').value);
+  config.whatsapp = document.getElementById('waBarberia').value;
   const nuevaPass = document.getElementById('nuevaPass').value.trim();
-  if(nuevaPass) nuevos.contrasena = nuevaPass;
-  
-  await refConfig.update(nuevos);
+  if(nuevaPass) config.contrasena = nuevaPass;
+  await refConfig.update(config);
   document.getElementById('guardadoAjustes').style.display='block';
   setTimeout(()=>document.getElementById('guardadoAjustes').style.display='none',3000);
-  if(nuevaPass) alert('✅ Contraseña actualizada correctamente');
-  config = {...config, ...nuevos};
+  actualizarSelectores();
 }
 
-document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-</script>
+// ===== FINANZAS =====
+async function agregarMovimiento(){
+  const tipo = document.getElementById('tipoMov').value;
+  const desc = document.getElementById('descMov').value.trim();
+  const monto = parseInt(document.getElementById('montoMov').value);
+  const fecha = document.getElementById('fechaMov').value;
+  if(!desc||!monto||!fecha){ alert('⚠️ Completar todos los campos'); return; }
+  await refMovimientos.push({tipo, descripcion:desc, monto, fecha, auto:false});
+  document.getElementById('descMov').value=''; document.getElementById('montoMov').value='';
+  document.getElementById('guardadoMov').style.display='block';
+  setTimeout(()=>document.getElementById('guardadoMov').style.display='none',3000);
+}
 
+async function calcularTotales(){
+  const snap = await refMovimientos.once('value');
+  const datos = snap.val() || {};
+  const movs = Object.values(datos);
+  let ing=0, gas=0, inv=0;
+  movs.forEach(m=>{ if(m.tipo==='ingreso') ing+=m.monto; else if(m.tipo==='gasto') gas+=m.monto; else if(m.tipo==='inversion') inv+=m.monto; });
+  document.getElementById('totalIngresos').textContent='$'+ing.toLocaleString('es-AR');
+  document.getElementById('totalGastos').textContent='$'+gas.toLocaleString('es-AR');
+  document.getElementById('totalInversion').textContent='$'+inv.toLocaleString('es-AR');
+  const saldo=ing-gas-inv;
+  document.getElementById('saldoTotal').textContent='$'+saldo.toLocaleString('es-AR');
+  document.getElementById('saldoTotal').style.color=saldo>=0?'var(--ganancia)':'var(--alerta)';
+}
+
+function cambiarFiltroMov(f){ filtroMovActual=f; document.querySelectorAll('#tab-finanzas .filtro').forEach(b=>b.classList.remove('activo')); event.target.classList.add('activo'); listarMovimientos(); }
+
+async function listarMovimientos(){
+  const c=document.getElementById('listaMovimientos'); c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">Cargando...</p>';
+  try {
+    const snap = await refMovimientos.once('value');
+    const datos = snap.val() || {};
+    let movs = Object.entries(datos).map(([id,m])=>({...m,id}));
+    if(movs.length===0){ c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:30px;">Sin movimientos registrados</p>'; return; }
+    movs.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+    if(filtroMovActual!=='todos') movs=movs.filter(m=>m.tipo===filtroMovActual);
+    c.innerHTML='';
+    movs.forEach(m=>{
+      const icon = m.tipo==='ingreso'?'🟢':m.tipo==='gasto'?'🟠':'🟣';
+      const etiquetaAuto = m.auto ? '<span class="auto-ingreso">🔄 Automático</span>' : '';
+      c.innerHTML += `<div class="item ${m.tipo}"><div><strong>${icon} ${m.descripcion}${etiquetaAuto}</strong><br><small style="color:var(--textoSec);">${m.fecha}</small></div><div style="font-weight:700; font-size:16px;">${m.tipo==='ingreso'?'+':'-'} $${m.monto.toLocaleString('es-AR')}</div></div>`;
+    });
+  } catch { c.innerHTML='<p style="color:var(--alerta); text-align:center; padding:30px;">❌ Error</p>'; }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('selFecha').min = hoy;
+});
+</script>
 </body>
 </html>
