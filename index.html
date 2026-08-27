@@ -9,7 +9,7 @@
         :root{
             --fondo: #050714; --fondoSec: #0F1229; --fondoTarjeta: #141835;
             --dorado: #D4AF37; --doradoClaro: #F0D78C; --exito: #22C55E; --alerta: #EF4444;
-            --whatsapp: #25D366;
+            --whatsapp: #25D366; --mercadopago: #009EE3;
             --texto: #E8E8F0; --textoSec: #9CA0C2; --borde: rgba(212,175,55,0.2);
         }
         body{background:var(--fondo); color:var(--texto); min-height:100vh; padding:20px 16px; max-width:520px; margin:0 auto;}
@@ -22,21 +22,22 @@
         h3{color:var(--doradoClaro); font-size:15px; margin:20px 0 10px;}
         label{display:block; margin:12px 0 6px; color:var(--textoSec); font-size:13px;}
         input, select, button{width:100%; padding:12px 14px; border:none; border-radius:8px; font-size:15px;}
-        input, select{background:var(--fondoSec); color:var(--texto); border:2px solid transparent;}
+        input, select{background:var(--fondoSec); color:var(--texto); border:2px solid transparent; cursor:pointer;}
         input:focus, select:focus{border-color:var(--dorado); outline:none;}
-        .btn{padding:12px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px; text-decoration:none; display:inline-block; text-align:center;}
+        select{appearance:menulist; -webkit-appearance:menulist;}
+        .btn{padding:12px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; text-align:center;}
         .btn-dorado{background:linear-gradient(135deg,var(--doradoClaro),var(--dorado)); color:#000; margin-top:20px;}
-        .btn-whatsapp{background:var(--whatsapp); color:#fff; margin-top:12px; display:flex; align-items:center; justify-content:center; gap:8px;}
+        .btn-whatsapp{background:var(--whatsapp); color:#fff; margin-top:12px;}
+        .btn-mercadopago{background:var(--mercadopago); color:#fff; margin-top:12px;}
         .btn-rojo{background:var(--alerta); color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
         .btn-verde{background:var(--exito); color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
         .btn-gris{background:#3F425F; color:#fff; padding:8px 14px; font-size:13px; width:auto; border:none; border-radius:6px; cursor:pointer; font-weight:600;}
         .fila{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
         .fila-doble{display:flex; gap:10px; flex-wrap:wrap;}
         .fila-doble > *{flex:1; min-width:130px;}
-        .fila-triple{display:flex; gap:8px; flex-wrap:wrap;}
-        .fila-triple > *{flex:1; min-width:100px;}
         .item{display:flex; justify-content:space-between; align-items:center; padding:14px; background:var(--fondoSec); border-radius:10px; margin-bottom:8px; border-left:3px solid var(--dorado); flex-wrap:wrap; gap:8px;}
         .item.atendido{border-left-color:var(--exito); opacity:0.7;}
+        .item.pagado{border-left-color:var(--mercadopago);}
         .item.ingreso{border-left-color:var(--exito);}
         .item.gasto{border-left-color:#F97316;}
         .item.inversion{border-left-color:#8B5CF6;}
@@ -60,12 +61,14 @@
         .aviso.error{color:var(--alerta);}
         .divisor{height:1px; background:var(--borde); margin:20px 0;}
         .etiqueta-atendido{background:var(--exito); color:#fff; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px;}
+        .etiqueta-pagado{background:var(--mercadopago); color:#fff; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px;}
         .dia-semana{background:var(--fondoSec); padding:12px; border-radius:8px; margin-bottom:8px; border-left:3px solid var(--dorado);}
         .dia-semana.descansa{opacity:0.6; border-left-color:var(--alerta);}
-        .chk-dia{width:auto; margin:0; margin-right:8px;}
+        .chk-dia{width:auto; margin:0; margin-right:8px; cursor:pointer;}
         .fila-horario{display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap;}
         .fila-horario input{width:80px; padding:8px 6px; text-align:center;}
         .etiqueta-dia{font-weight:600; color:var(--doradoClaro);}
+        .link-copiable{background:var(--fondoSec); padding:12px; border-radius:6px; margin-top:8px; word-break:break-all; font-family:monospace; font-size:12px; color:var(--textoSec); user-select:all; cursor:text; border:1px dashed var(--borde);}
     </style>
 </head>
 <body>
@@ -78,168 +81,179 @@
 </div>
 
 <!-- PÁGINA DE RESERVAS -->
-<div id="reservar">
+<div id="pagina-reservar">
     <div class="caja">
         <h2>📅 Reservar Turno</h2>
-        <div id="formRes">
+        <div id="formulario-turno">
             <label>Barbero</label>
-            <select id="selBarbero" onchange="cargarHorarios()">
+            <select id="sel-barbero" onchange="cargarHorarios()">
                 <option value="">— Seleccionar barbero —</option>
             </select>
 
             <label>Servicio</label>
-            <select id="selServicio">
+            <select id="sel-servicio">
                 <option value="">— Seleccionar servicio —</option>
             </select>
 
             <label>Fecha</label>
-            <input type="date" id="selFecha" onchange="cargarHorarios()">
+            <input type="date" id="sel-fecha" onchange="cargarHorarios()">
 
             <label>Horario</label>
-            <select id="selHora">
+            <select id="sel-hora">
                 <option value="">— Elegí primero barbero y fecha —</option>
             </select>
-            <p id="avisoHorario" class="aviso oculto"></p>
+            <p id="aviso-horario" class="aviso oculto"></p>
 
             <label>Tu Nombre</label>
-            <input type="text" id="inpNombre" placeholder="Tu nombre completo">
+            <input type="text" id="inp-nombre" placeholder="Tu nombre completo">
 
             <label>Tu WhatsApp</label>
-            <input type="tel" id="inpTel" placeholder="+54 9 298 123-4567">
+            <input type="tel" id="inp-telefono" placeholder="+54 9 298 123-4567">
 
             <button class="btn btn-dorado" onclick="confirmarTurno()">✅ CONFIRMAR TURNO</button>
         </div>
 
-        <div id="confirmado" class="oculto">
+        <div id="confirmacion-exito" class="oculto">
             <p style="color:var(--exito); font-size:20px; font-weight:bold; text-align:center; margin:20px 0;">✅ ¡TURNO CONFIRMADO!</p>
             <div class="resumen">
-                <strong>Nombre:</strong> <span id="rNombre"></span><br>
-                <strong>Barbero:</strong> <span id="rBarbero"></span><br>
-                <strong>Servicio:</strong> <span id="rServicio"></span><br>
-                <strong>Fecha:</strong> <span id="rFecha"></span><br>
-                <strong>Hora:</strong> <span id="rHora"></span><br>
-                <strong>Precio:</strong> <span id="rPrecio"></span>
+                <strong>Nombre:</strong> <span id="res-nombre"></span><br>
+                <strong>Barbero:</strong> <span id="res-barbero"></span><br>
+                <strong>Servicio:</strong> <span id="res-servicio"></span><br>
+                <strong>Fecha:</strong> <span id="res-fecha"></span><br>
+                <strong>Hora:</strong> <span id="res-hora"></span><br>
+                <strong>Precio:</strong> <span id="res-precio"></span>
             </div>
-            <a id="btnWa" class="btn btn-whatsapp" target="_blank">💬 ENVIAR POR WHATSAPP</a>
-            <button class="btn btn-gris" style="width:100%; margin-top:16px;" onclick="volver()">🔄 Reservar otro</button>
+
+            <!-- ✅ BOTÓN MERCADO PAGO BIEN VISIBLE Y APARTE -->
+            <a id="btn-mercadopago" class="btn btn-mercadopago" target="_blank">💳 PAGAR CON MERCADO PAGO</a>
+            
+            <!-- Link para copiar si lo necesitás -->
+            <p style="color:var(--textoSec); font-size:13px; margin-top:16px; margin-bottom:4px;">📋 Link para copiar y pegar:</p>
+            <div id="link-mp-copiable" class="link-copiable"></div>
+
+            <a id="btn-whatsapp" class="btn btn-whatsapp" target="_blank">💬 ENVIAR POR WHATSAPP</a>
+            
+            <button class="btn btn-gris" style="width:100%; margin-top:16px;" onclick="volverAReserva()">🔄 Reservar otro</button>
         </div>
     </div>
 </div>
 
-<!-- PANEL ADMINISTRATIVO -->
-<div id="admin" class="oculto">
-    <div class="caja" id="cajaPass">
+<!-- PANEL ADMINISTRATIVO COMPLETO -->
+<div id="pagina-admin" class="oculto">
+    <div class="caja" id="caja-login">
         <h2 style="text-align:center; border:none;">🔒 Acceso Administrativo</h2>
-        <input type="password" id="passAdmin" placeholder="Ingresar contraseña">
-        <button class="btn btn-dorado" onclick="ingresar()">Ingresar</button>
+        <input type="password" id="input-pass-admin" placeholder="Ingresar contraseña">
+        <button class="btn btn-dorado" onclick="ingresarAdmin()">Ingresar</button>
         <button class="btn btn-gris" style="width:100%; margin-top:12px;" onclick="irA('reservar')">← Volver</button>
     </div>
 
-    <div id="panelConfig" class="oculto">
+    <div id="panel-administracion" class="oculto">
         <div class="tabs">
-            <div class="tab activo" onclick="cambiarTab('turnos')">📋 Turnos</div>
-            <div class="tab" onclick="cambiarTab('finanzas')">💰 Finanzas</div>
-            <div class="tab" onclick="cambiarTab('barberos')">🧑‍💼 Barberos</div>
-            <div class="tab" onclick="cambiarTab('servicios')">💇 Servicios</div>
-            <div class="tab" onclick="cambiarTab('ajustes')">⚙️ Ajustes</div>
+            <div class="tab activo" onclick="cambiarPestaña('turnos')">📋 Turnos</div>
+            <div class="tab" onclick="cambiarPestaña('finanzas')">💰 Finanzas</div>
+            <div class="tab" onclick="cambiarPestaña('barberos')">🧑‍💼 Barberos</div>
+            <div class="tab" onclick="cambiarPestaña('servicios')">💇 Servicios</div>
+            <div class="tab" onclick="cambiarPestaña('ajustes')">⚙️ Ajustes</div>
         </div>
 
         <!-- TURNOS -->
-        <div id="tab-turnos">
+        <div id="pestaña-turnos">
             <div class="caja">
                 <div class="filtros">
-                    <button class="filtro activo" onclick="cambiarFiltro('todos')">Todos</button>
-                    <button class="filtro" onclick="cambiarFiltro('pendientes')">Pendientes</button>
-                    <button class="filtro" onclick="cambiarFiltro('atendidos')">Atendidos</button>
+                    <button class="filtro activo" onclick="cambiarFiltroTurnos('todos')">Todos</button>
+                    <button class="filtro" onclick="cambiarFiltroTurnos('pendientes')">Pendientes</button>
+                    <button class="filtro" onclick="cambiarFiltroTurnos('pagados')">💳 Pagados</button>
+                    <button class="filtro" onclick="cambiarFiltroTurnos('atendidos')">✅ Atendidos</button>
                 </div>
-                <div id="listaTurnos"></div>
+                <div id="lista-turnos"></div>
             </div>
         </div>
 
-        <!-- FINANZAS -->
-        <div id="tab-finanzas" class="oculto">
+        <!-- FINANZAS COMPLETO -->
+        <div id="pestaña-finanzas" class="oculto">
             <div class="caja">
                 <h2>💰 Finanzas</h2>
                 <div class="caja-resumen">
-                    <div class="tarjeta ingreso"><div>Ingresos</div><div class="monto" id="totalIngresos">$0</div></div>
-                    <div class="tarjeta gasto"><div>Gastos</div><div class="monto" id="totalGastos">$0</div></div>
-                    <div class="tarjeta inversion"><div>Inversión</div><div class="monto" id="totalInversion">$0</div></div>
+                    <div class="tarjeta ingreso"><div>Ingresos</div><div class="monto" id="total-ingresos">$0</div></div>
+                    <div class="tarjeta gasto"><div>Gastos</div><div class="monto" id="total-gastos">$0</div></div>
+                    <div class="tarjeta inversion"><div>Inversión</div><div class="monto" id="total-inversion">$0</div></div>
                 </div>
-                <div class="balance-final"><strong>Saldo Actual</strong><div class="monto-total" id="saldoTotal">$0</div></div>
+                <div class="balance-final"><strong>Saldo Actual</strong><div class="monto-total" id="saldo-total">$0</div></div>
                 <div class="divisor"></div>
                 <h3>➕ Agregar Movimiento Manual</h3>
                 <label>Tipo</label>
-                <select id="tipoMov">
+                <select id="sel-tipo-mov">
                     <option value="ingreso">🟢 Ingreso</option>
                     <option value="gasto">🟠 Gasto</option>
                     <option value="inversion">🟣 Inversión</option>
                 </select>
                 <label>Descripción</label>
-                <input type="text" id="descMov" placeholder="Ej: Productos, alquiler...">
+                <input type="text" id="desc-mov" placeholder="Ej: Productos, alquiler...">
                 <label>Monto $</label>
-                <input type="number" id="montoMov" min="1">
+                <input type="number" id="monto-mov" min="1">
                 <label>Fecha</label>
-                <input type="date" id="fechaMov">
+                <input type="date" id="fecha-mov">
                 <button class="btn btn-dorado" onclick="agregarMovimiento()">💾 Guardar</button>
                 <div class="divisor"></div>
-                <h3>📊 Historial — Eliminar si te equivocaste</h3>
+                <h3>📊 Historial — Eliminar por separado</h3>
                 <div class="filtros">
                     <button class="filtro activo" onclick="cambiarFiltroMov('todos')">Todos</button>
                     <button class="filtro" onclick="cambiarFiltroMov('ingreso')">🟢 Ingresos</button>
                     <button class="filtro" onclick="cambiarFiltroMov('gasto')">🟠 Gastos</button>
                     <button class="filtro" onclick="cambiarFiltroMov('inversion')">🟣 Inversiones</button>
                 </div>
-                <div id="listaMovimientos"></div>
+                <div id="lista-movimientos"></div>
             </div>
         </div>
 
         <!-- BARBEROS + HORARIOS INDIVIDUALES -->
-        <div id="tab-barberos" class="oculto">
+        <div id="pestaña-barberos" class="oculto">
             <div class="caja">
                 <h3>Agregar Barbero</h3>
-                <input type="text" id="nuevoBarbero" placeholder="Nombre del barbero">
+                <input type="text" id="nombre-nuevo-barbero" placeholder="Nombre del barbero">
                 <button class="btn btn-dorado" onclick="agregarBarbero()">➕ Agregar</button>
                 <div class="divisor"></div>
                 <h3>🧑‍💼 Barberos y Horarios</h3>
-                <p style="color:var(--textoSec); font-size:13px; margin-bottom:16px;">Seleccioná un barbero para configurar su horario</p>
                 <label>Editar horario de:</label>
-                <select id="selBarberoHorario" onchange="cargarHorarioBarbero()">
+                <select id="sel-barbero-horario" onchange="cargarFormularioHorario()">
                     <option value="">— Elegí barbero —</option>
                 </select>
-                <div id="configHorarioBarbero" class="oculto" style="margin-top:20px;">
+                <div id="form-horario-barbero" class="oculto" style="margin-top:20px;">
                     <h3>📅 Horario Semanal</h3>
-                    <p style="color:var(--textoSec); font-size:12px; margin-bottom:12px;">Marcá los días que trabaja y configurá los horarios</p>
-                    <div id="diasSemana"></div>
+                    <p style="color:var(--textoSec); font-size:12px; margin-bottom:12px;">Marcá los días que trabaja y configurá mañana/tarde</p>
+                    <div id="contenedor-dias"></div>
                     <button class="btn btn-dorado" onclick="guardarHorarioBarbero()">💾 Guardar Horario</button>
                 </div>
                 <div class="divisor"></div>
                 <h3>Lista de Barberos</h3>
-                <div id="listaBarberos"></div>
+                <div id="lista-barberos"></div>
             </div>
         </div>
 
         <!-- SERVICIOS -->
-        <div id="tab-servicios" class="oculto">
+        <div id="pestaña-servicios" class="oculto">
             <div class="caja">
                 <h3>Agregar Servicio</h3>
                 <div class="fila-doble">
-                    <input type="text" id="nuevoServicio" placeholder="Nombre">
-                    <input type="number" id="precioServicio" placeholder="Precio $">
+                    <input type="text" id="nombre-nuevo-servicio" placeholder="Nombre">
+                    <input type="number" id="precio-nuevo-servicio" placeholder="Precio $">
                 </div>
                 <button class="btn btn-dorado" onclick="agregarServicio()">➕ Agregar</button>
                 <h3>Lista de Servicios</h3>
-                <div id="listaServicios"></div>
+                <div id="lista-servicios"></div>
             </div>
         </div>
 
         <!-- AJUSTES -->
-        <div id="tab-ajustes" class="oculto">
+        <div id="pestaña-ajustes" class="oculto">
             <div class="caja">
                 <h3>⚙️ Configuración General</h3>
-                <label>WhatsApp de la Barbería (sin espacios ni símbolos)</label>
-                <input type="tel" id="waBarberia" value="5492984548329">
-                <label>Contraseña de Admin</label>
-                <input type="password" id="nuevaPass" placeholder="Dejar vacío para no cambiar">
+                <label>🔗 Enlace de Mercado Pago</label>
+                <input type="text" id="link-mercadopago" placeholder="https://link.mercadopago.com.ar/tu-enlace">
+                <label>📱 WhatsApp de la Barbería</label>
+                <input type="tel" id="numero-whatsapp" value="5492984548329">
+                <label>🔑 Contraseña de Administrador</label>
+                <input type="password" id="nueva-pass-admin" placeholder="Dejar vacío para no cambiar">
                 <button class="btn btn-dorado" onclick="guardarAjustes()">💾 Guardar Cambios</button>
             </div>
         </div>
@@ -252,7 +266,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <script>
-// CONFIGURACIÓN FIREBASE
+// === CONFIGURACIÓN FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyAe-Ysqg7w8HzQ707MEqd4tiqH7qZWHGMA",
   authDomain: "mistico-barberia.firebaseapp.com",
@@ -267,14 +281,12 @@ const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
 const refMovimientos = db.ref('movimientos');
 
-// DÍAS DE LA SEMANA
-const NOMBRES_DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-const DIAS_NUM = {Lunes:1,Martes:2,Miércoles:3,Jueves:4,Viernes:5,Sábado:6,Domingo:0};
-
-// DATOS POR DEFECTO
-let config = {
+// === DATOS INICIALES ===
+const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+let configuracion = {
   contrasena: 'admin123',
   whatsapp: '5492984548329',
+  linkMercadoPago: '',
   barberos: [
     {nombre: 'Nico', horarios: {
       Lunes: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
@@ -294,229 +306,203 @@ let config = {
   ]
 };
 
-let filtroActual = 'todos', filtroMovActual = 'todos', paginaActual = 'reservar';
+let filtroTurnos = 'todos', filtroMov = 'todos', paginaActual = 'reservar';
 let barberoEditando = null;
 
-// CARGA CONFIGURACIÓN
-refConfig.on('value', snap => {
-  if(snap.exists()) {
-    const datos = snap.val();
-    config = {...config, ...datos};
-    // Convertir barberos de formato simple a objeto completo si viene como array de nombres
-    if(config.barberos.length > 0 && typeof config.barberos[0] === 'string') {
-      config.barberos = config.barberos.map(n => crearBarbero(n));
+// === CARGA CONFIGURACIÓN + ASEGURA QUE SIEMPRE HAYA OPCIONES CARGADAS ===
+refConfig.on('value', (snapshot) => {
+  if(snapshot.exists()) {
+    const datosGuardados = snapshot.val();
+    configuracion = {...configuracion, ...datosGuardados};
+    if(configuracion.barberos.length > 0 && typeof configuracion.barberos[0] === 'string') {
+      configuracion.barberos = configuracion.barberos.map(n => crearBarberoNuevo(n));
     }
   }
-  actualizarSelectores();
+  // ✅ CARGA SIEMPRE LOS SELECTORES INCLUSO ANTES DE QUE FIREBASE RESPONDA
+  actualizarListasSeleccion();
 });
 
-function crearBarbero(nombre){
+function crearBarberoNuevo(nombre){
   const horarios = {};
-  NOMBRES_DIAS.forEach(d => {
-    horarios[d] = {
-      activo: d !== 'Domingo',
-      mañanaDesde:'09:00', mañanaHasta:'12:00',
-      tardeDesde:'15:00', tardeHasta:'21:00'
-    };
+  DIAS_SEMANA.forEach(d => {
+    horarios[d] = {activo: d !== 'Domingo', mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'};
   });
-  horarios.Domingo.activo = false;
-  horarios.Sábado.tardeHasta = '20:00';
+  horarios.Domingo.activo = false; horarios.Sábado.tardeHasta = '20:00';
   return {nombre, horarios};
 }
 
-actualizarSelectores();
-
-// NAVEGACIÓN
+// === NAVEGACIÓN ===
 function irA(pagina){
   paginaActual = pagina;
-  document.getElementById('reservar').classList.add('oculto');
-  document.getElementById('admin').classList.add('oculto');
-  document.getElementById(pagina).classList.remove('oculto');
-  if(pagina === 'admin'){
-    document.getElementById('cajaPass').classList.remove('oculto');
-    document.getElementById('panelConfig').classList.add('oculto');
-  }
-  if(pagina === 'reservar'){
-    document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-    actualizarSelectores();
+  document.getElementById('pagina-reservar').classList.add('oculto');
+  document.getElementById('pagina-admin').classList.add('oculto');
+  if(pagina === 'reservar') {
+    document.getElementById('pagina-reservar').classList.remove('oculto');
+    document.getElementById('sel-fecha').min = new Date().toISOString().split('T')[0];
+    actualizarListasSeleccion();
+  } else {
+    document.getElementById('pagina-admin').classList.remove('oculto');
+    document.getElementById('caja-login').classList.remove('oculto');
+    document.getElementById('panel-administracion').classList.add('oculto');
   }
 }
 
-function ingresar(){
-  if(document.getElementById('passAdmin').value === config.contrasena){
-    document.getElementById('cajaPass').classList.add('oculto');
-    document.getElementById('panelConfig').classList.remove('oculto');
-    cambiarTab('turnos');
-    listarTurnos(); listarBarberos(); listarServicios();
-    document.getElementById('waBarberia').value = config.whatsapp;
+function ingresarAdmin(){
+  if(document.getElementById('input-pass-admin').value === configuracion.contrasena){
+    document.getElementById('caja-login').classList.add('oculto');
+    document.getElementById('panel-administracion').classList.remove('oculto');
+    cambiarPestaña('turnos');
+    document.getElementById('numero-whatsapp').value = configuracion.whatsapp;
+    document.getElementById('link-mercadopago').value = configuracion.linkMercadoPago || '';
   }else{ alert('❌ Contraseña incorrecta'); }
 }
 
-function actualizarSelectores(){
-  const selB = document.getElementById('selBarbero');
-  const selBH = document.getElementById('selBarberoHorario');
-  const selS = document.getElementById('selServicio');
+function actualizarListasSeleccion(){
+  const selB = document.getElementById('sel-barbero');
+  const selBH = document.getElementById('sel-barbero-horario');
+  const selS = document.getElementById('sel-servicio');
   if(!selB || !selS) return;
+  
   selB.innerHTML = '<option value="">— Seleccionar barbero —</option>';
   selBH.innerHTML = '<option value="">— Elegí barbero —</option>';
-  config.barberos.forEach(b => {
+  configuracion.barberos.forEach(b => {
     selB.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
     selBH.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
   });
+  
   selS.innerHTML = '<option value="">— Seleccionar servicio —</option>';
-  config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre}||${s.precio}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
+  configuracion.servicios.forEach(s => {
+    selS.innerHTML += `<option value="${s.nombre}||${s.precio}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`;
+  });
 }
 
-function cambiarTab(nombre){
+function cambiarPestaña(nombre){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
   event.target.classList.add('activo');
-  ['turnos','finanzas','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
-  document.getElementById('tab-'+nombre).classList.remove('oculto');
-  if(nombre === 'finanzas'){ calcularTotales(); listarMovimientos(); document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0]; }
-  if(nombre === 'barberos'){ listarBarberos(); }
+  ['turnos','finanzas','barberos','servicios','ajustes'].forEach(p=>document.getElementById(`pestaña-${p}`).classList.add('oculto'));
+  document.getElementById(`pestaña-${nombre}`).classList.remove('oculto');
+  if(nombre==='finanzas'){ document.getElementById('fecha-mov').value=new Date().toISOString().split('T')[0]; calcularTotalesFinanzas(); listarMovimientos(); }
+  if(nombre==='barberos') listarListaBarberos();
+  if(nombre==='turnos') listarTodosTurnos();
 }
 
-// === GENERAR HORARIOS SEGÚN EL HORARIO INDIVIDUAL DEL BARBERO ===
-function generarHorariosDesdeConfig(horarioDia){
+// === GENERAR HORARIOS ===
+function generarHorariosDisponibles(horarioDia){
   const horarios = [];
   if(!horarioDia || !horarioDia.activo) return horarios;
-  
-  // Horarios de la mañana
   if(horarioDia.mañanaDesde && horarioDia.mañanaHasta){
     let h = horarioDia.mañanaDesde;
-    while(h <= horarioDia.mañanaHasta){
-      horarios.push(h);
-      h = sumarMediaHora(h);
-    }
+    while(h <= horarioDia.mañanaHasta){ horarios.push(h); h = sumar30Min(h); }
   }
-  // Horarios de la tarde
   if(horarioDia.tardeDesde && horarioDia.tardeHasta){
     let h = horarioDia.tardeDesde;
-    while(h <= horarioDia.tardeHasta){
-      horarios.push(h);
-      h = sumarMediaHora(h);
-    }
+    while(h <= horarioDia.tardeHasta){ horarios.push(h); h = sumar30Min(h); }
   }
   return horarios;
 }
 
-function sumarMediaHora(hora){
-  let [h,m] = hora.split(':').map(Number);
-  m += 30;
-  if(m >= 60){ h++; m -= 60; }
+function sumar30Min(hora){
+  let [h,m] = hora.split(':').map(Number); m+=30; if(m>=60){h++;m-=60;}
   return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
 }
 
 async function cargarHorarios(){
-  const nombreBarbero = document.getElementById('selBarbero').value;
-  const fecha = document.getElementById('selFecha').value;
-  const selH = document.getElementById('selHora');
-  const aviso = document.getElementById('avisoHorario');
+  const nombreBarbero = document.getElementById('sel-barbero').value;
+  const fecha = document.getElementById('sel-fecha').value;
+  const selH = document.getElementById('sel-hora');
   selH.innerHTML = '<option value="">— Elegí horario —</option>';
-  aviso.classList.add('oculto');
   if(!nombreBarbero || !fecha) return;
   
-  // Obtener el día de la semana
-  const fechaObj = new Date(fecha);
-  const nombreDia = NOMBRES_DIAS[fechaObj.getDay()];
-  
-  // Buscar el barbero y su horario para ese día
-  const barbero = config.barberos.find(b => b.nombre === nombreBarbero);
+  const nombreDia = DIAS_SEMANA[new Date(fecha).getDay()];
+  const barbero = configuracion.barberos.find(b => b.nombre === nombreBarbero);
   if(!barbero) return;
   
   const horarioDia = barbero.horarios[nombreDia];
   if(!horarioDia || !horarioDia.activo){
-    selH.innerHTML = '<option value="">❌ '+nombreBarbero+' no trabaja este día</option>';
+    selH.innerHTML = `<option value="">❌ ${nombreBarbero} no trabaja este día</option>`;
     return;
   }
   
-  // Generar todos los horarios disponibles para ese día
-  const todosHorarios = generarHorariosDesdeConfig(horarioDia);
-  
+  const todosHorarios = generarHorariosDisponibles(horarioDia);
   try {
     const snap = await refTurnos.once('value');
-    const todos = snap.val() || {};
-    const ocupados = Object.values(todos).filter(t => !t.atendido && t.barbero === nombreBarbero && t.fecha === fecha).map(t => t.hora);
-    
-    todosHorarios.forEach(h => {
-      if(!ocupados.includes(h)) selH.innerHTML += `<option value="${h}">${h}</option>`;
-    });
-    if(selH.options.length === 1) selH.innerHTML = '<option value="">❌ No hay horarios disponibles</option>';
-  } catch {
-    aviso.classList.remove('oculto'); aviso.textContent = '⚠️ Sin conexión — intenta nuevamente'; aviso.classList.add('error');
-  }
+    const ocupados = Object.values(snap.val()||{}).filter(t=>!t.atendido&&t.barbero===nombreBarbero&&t.fecha===fecha).map(t=>t.hora);
+    todosHorarios.forEach(h=>{ if(!ocupados.includes(h)) selH.innerHTML += `<option value="${h}">${h}</option>`; });
+    if(selH.options.length===1) selH.innerHTML = '<option value="">❌ No hay horarios disponibles</option>';
+  } catch { document.getElementById('aviso-horario').classList.remove('oculto'); document.getElementById('aviso-horario').textContent='⚠️ Error de conexión'; }
 }
 
-// === CONFIRMAR TURNO + INGRESO AUTOMÁTICO EN FINANZAS ===
+// === CONFIRMAR TURNO + BOTÓN MERCADO PAGO ===
 async function confirmarTurno(){
-  const nombre = document.getElementById('inpNombre').value.trim();
-  const barbero = document.getElementById('selBarbero').value;
-  const selServicioValor = document.getElementById('selServicio').value;
-  if(!selServicioValor){ alert('⚠️ Elegí un servicio'); return; }
-  const [servicio, precio] = selServicioValor.split('||');
-  const fecha = document.getElementById('selFecha').value;
-  const hora = document.getElementById('selHora').value;
-  const tel = document.getElementById('inpTel').value.trim();
+  const nombre = document.getElementById('inp-nombre').value.trim();
+  const barbero = document.getElementById('sel-barbero').value;
+  const [servicio, precio] = document.getElementById('sel-servicio').value.split('||');
+  const fecha = document.getElementById('sel-fecha').value;
+  const hora = document.getElementById('sel-hora').value;
+  const telefono = document.getElementById('inp-telefono').value.trim();
   
-  if(!nombre||!barbero||!servicio||!fecha||!hora||!tel){ alert('⚠️ Completá todos los campos'); return; }
-  if(hora.includes('❌') || hora === ''){ alert('⚠️ Elegí un horario válido'); return; }
+  if(!nombre||!barbero||!servicio||!fecha||!hora||!telefono){ alert('⚠️ Completá todos los campos'); return; }
+  if(hora.includes('❌')){ alert('⚠️ Elegí un horario válido'); return; }
   
-  // Guardar turno
-  await refTurnos.push({barbero, fecha, hora, nombre, telefono:tel, servicio, precio:parseInt(precio), atendido:false});
-  
-  // ✅ REGISTRAR INGRESO AUTOMÁTICO EN FINANZAS
-  await refMovimientos.push({
-    tipo: 'ingreso',
-    descripcion: `Turno: ${servicio} — ${nombre} (${barbero})`,
-    monto: parseInt(precio),
-    fecha: fecha
-  });
+  const turno = {barbero, fecha, hora, nombre, telefono, servicio, precio:parseInt(precio), atendido:false, pagado:false};
+  await refTurnos.push(turno);
+  await refMovimientos.push({tipo:'ingreso', descripcion:`Turno: ${servicio} — ${nombre} (${barbero})`, monto:parseInt(precio), fecha});
   
   // Mostrar confirmación
-  document.getElementById('formRes').classList.add('oculto');
-  document.getElementById('confirmado').classList.remove('oculto');
-  document.getElementById('rNombre').textContent = nombre;
-  document.getElementById('rBarbero').textContent = barbero;
-  document.getElementById('rServicio').textContent = servicio;
-  document.getElementById('rFecha').textContent = fecha;
-  document.getElementById('rHora').textContent = hora;
-  document.getElementById('rPrecio').textContent = '$' + parseInt(precio).toLocaleString('es-AR');
+  document.getElementById('formulario-turno').classList.add('oculto');
+  document.getElementById('confirmacion-exito').classList.remove('oculto');
+  document.getElementById('res-nombre').textContent = nombre;
+  document.getElementById('res-barbero').textContent = barbero;
+  document.getElementById('res-servicio').textContent = servicio;
+  document.getElementById('res-fecha').textContent = fecha;
+  document.getElementById('res-hora').textContent = hora;
+  document.getElementById('res-precio').textContent = '$' + parseInt(precio).toLocaleString('es-AR');
   
-  // ✅ BOTÓN DE WHATSAPP
-  const mensaje = encodeURIComponent(`✅ *TURNO CONFIRMADO*\n\n👤 Cliente: ${nombre}\n💇 Servicio: ${servicio}\n🧑‍💼 Barbero: ${barbero}\n📅 Fecha: ${fecha}\n⏰ Hora: ${hora}\n💰 Precio: $${parseInt(precio).toLocaleString('es-AR')}`);
-  const numWa = config.whatsapp.replace(/\D/g,'');
-  document.getElementById('btnWa').href = `https://wa.me/${numWa}?text=${mensaje}`;
+  // ✅ BOTÓN MERCADO PAGO + LINK COPIABLE
+  if(configuracion.linkMercadoPago){
+    document.getElementById('btn-mercadopago').href = configuracion.linkMercadoPago;
+    document.getElementById('btn-mercadopago').classList.remove('oculto');
+    document.getElementById('link-mp-copiable').textContent = configuracion.linkMercadoPago;
+    document.getElementById('link-mp-copiable').classList.remove('oculto');
+  } else {
+    document.getElementById('btn-mercadopago').classList.add('oculto');
+    document.getElementById('link-mp-copiable').textContent = '⚠️ Configurá tu link de Mercado Pago en Ajustes ⚙️';
+    document.getElementById('link-mp-copiable').classList.remove('oculto');
+  }
+  
+  // Botón WhatsApp
+  const textoWa = encodeURIComponent(`✅ *TURNO CONFIRMADO*\nCliente: ${nombre}\nBarbero: ${barbero}\nServicio: ${servicio}\nFecha: ${fecha} ${hora}\nPrecio: $${parseInt(precio).toLocaleString('es-AR')}`);
+  document.getElementById('btn-whatsapp').href = `https://wa.me/${configuracion.whatsapp.replace(/\D/g,'')}?text=${textoWa}`;
 }
 
-function volver(){
-  document.getElementById('formRes').classList.remove('oculto');
-  document.getElementById('confirmado').classList.add('oculto');
-  document.getElementById('inpNombre').value='';
-  document.getElementById('selBarbero').value='';
-  document.getElementById('selServicio').value='';
-  document.getElementById('selFecha').value='';
-  document.getElementById('selHora').value='';
+function volverAReserva(){
+  document.getElementById('formulario-turno').classList.remove('oculto');
+  document.getElementById('confirmacion-exito').classList.add('oculto');
+  document.getElementById('inp-nombre').value=''; document.getElementById('inp-telefono').value='';
+  document.getElementById('sel-barbero').value=''; document.getElementById('sel-servicio').value='';
+  document.getElementById('sel-fecha').value=''; document.getElementById('sel-hora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
 }
 
 // === LISTAR TURNOS ===
-refTurnos.on('value', snap => { listarTurnos(); });
+refTurnos.on('value', ()=>{if(paginaActual==='admin') listarTodosTurnos();});
 
-function listarTurnos(){
-  const lista = document.getElementById('listaTurnos');
-  refTurnos.once('value').then(snap => {
-    const todos = snap.val() || {};
-    lista.innerHTML = '';
-    Object.entries(todos).reverse().forEach(([id, t]) => {
-      if(filtroActual === 'pendientes' && t.atendido) return;
-      if(filtroActual === 'atendidos' && !t.atendido) return;
+function listarTodosTurnos(){
+  const lista = document.getElementById('lista-turnos');
+  refTurnos.once('value').then(snap=>{
+    const todos = snap.val()||{}; lista.innerHTML='';
+    if(Object.keys(todos).length===0){ lista.innerHTML='<p style="color:var(--textoSec);text-align:center;padding:20px;">No hay turnos</p>'; return; }
+    Object.entries(todos).reverse().forEach(([id,t])=>{
+      if(filtroTurnos==='pendientes'&&(t.atendido||t.pagado)) return;
+      if(filtroTurnos==='pagados'&&!t.pagado) return;
+      if(filtroTurnos==='atendidos'&&!t.atendido) return;
+      let clases='', etiqueta='';
+      if(t.atendido){clases='atendido';etiqueta='<span class="etiqueta-atendido">✅ ATENDIDO</span>';}
+      else if(t.pagado){clases='pagado';etiqueta='<span class="etiqueta-pagado">💳 PAGADO</span>';}
       lista.innerHTML += `
-        <div class="item ${t.atendido?'atendido':''}">
-          <div>
-            <strong>${t.hora} — ${t.nombre}</strong>
-            ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br>
-            <small style="color:var(--textoSec);">${t.barbero} · ${t.servicio} · ${t.fecha} · $${t.precio.toLocaleString('es-AR')}</small>
-          </div>
+        <div class="item ${clases}">
+          <div><strong>${t.hora} — ${t.nombre}</strong> ${etiqueta}<br><small style="color:var(--textoSec);">${t.barbero} · ${t.servicio} · ${t.fecha} · $${t.precio.toLocaleString('es-AR')}</small></div>
           <div class="fila">
+            ${!t.pagado&&!t.atendido?`<button class="btn-verde btn-rojo" onclick="marcarPagado('${id}')">💳 Pagado</button>`:''}
             ${!t.atendido?`<button class="btn-verde btn-rojo" onclick="marcarAtendido('${id}')">✅ Listo</button>`:`<button class="btn-gris btn-rojo" onclick="desmarcar('${id}')">↩️ Deshacer</button>`}
             <button class="btn-rojo btn-rojo" onclick="borrarTurno('${id}')">🗑️</button>
             <a href="https://wa.me/${t.telefono.replace(/\D/g,'')}" target="_blank" class="btn-verde btn-rojo">💬</a>
@@ -524,232 +510,132 @@ function listarTurnos(){
         </div>
       `;
     });
-    if(!lista.innerHTML) lista.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:20px;">No hay turnos</p>';
   });
 }
 
-function cambiarFiltro(f){
-  filtroActual = f;
-  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
-  event.target.classList.add('activo');
-  listarTurnos();
-}
+function cambiarFiltroTurnos(f){filtroTurnos=f;document.querySelectorAll('#pestaña-turnos .filtro').forEach(b=>b.classList.remove('activo'));event.target.classList.add('activo');listarTodosTurnos();}
+async function marcarPagado(id){await refTurnos.child(id).update({pagado:true});}
+async function marcarAtendido(id){await refTurnos.child(id).update({atendido:true});}
+async function desmarcar(id){await refTurnos.child(id).update({atendido:false,pagado:false});}
+async function borrarTurno(id){if(!confirm('¿Eliminar?'))return;await refTurnos.child(id).remove();}
 
-async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
-async function desmarcar(id){ await refTurnos.child(id).update({atendido:false}); }
-async function borrarTurno(id){ if(!confirm('¿Eliminar este turno?')) return; await refTurnos.child(id).remove(); }
+// === FINANZAS COMPLETA ===
+refMovimientos.on('value',()=>{if(paginaActual==='admin'&&!document.getElementById('pestaña-finanzas').classList.contains('oculto')){calcularTotalesFinanzas();listarMovimientos();}});
 
-// === FINANZAS ===
-refMovimientos.on('value', snap => {
-  if(paginaActual === 'admin' && document.getElementById('tab-finanzas') && !document.getElementById('tab-finanzas').classList.contains('oculto')){
-    calcularTotales(); listarMovimientos();
-  }
-});
-
-function calcularTotales(){
-  refMovimientos.once('value').then(snap => {
-    const todos = snap.val() || {};
-    let ing=0, gas=0, inv=0;
-    Object.values(todos).forEach(m => {
-      if(m.tipo==='ingreso') ing+=m.monto;
-      else if(m.tipo==='gasto') gas+=m.monto;
-      else if(m.tipo==='inversion') inv+=m.monto;
-    });
-    document.getElementById('totalIngresos').textContent = '$'+ing.toLocaleString('es-AR');
-    document.getElementById('totalGastos').textContent = '$'+gas.toLocaleString('es-AR');
-    document.getElementById('totalInversion').textContent = '$'+inv.toLocaleString('es-AR');
-    document.getElementById('saldoTotal').textContent = '$'+(ing-gas-inv).toLocaleString('es-AR');
+function calcularTotalesFinanzas(){
+  refMovimientos.once('value').then(snap=>{
+    const todos=snap.val()||{}; let ing=0,gas=0,inv=0;
+    Object.values(todos).forEach(m=>{if(m.tipo==='ingreso')ing+=m.monto;else if(m.tipo==='gasto')gas+=m.monto;else if(m.tipo==='inversion')inv+=m.monto;});
+    document.getElementById('total-ingresos').textContent='$'+ing.toLocaleString('es-AR');
+    document.getElementById('total-gastos').textContent='$'+gas.toLocaleString('es-AR');
+    document.getElementById('total-inversion').textContent='$'+inv.toLocaleString('es-AR');
+    document.getElementById('saldo-total').textContent='$'+(ing-gas-inv).toLocaleString('es-AR');
   });
 }
 
 function listarMovimientos(){
-  const lista = document.getElementById('listaMovimientos');
-  refMovimientos.once('value').then(snap => {
-    const todos = snap.val() || {};
-    lista.innerHTML = '';
-    Object.entries(todos).reverse().forEach(([id, m]) => {
-      if(filtroMovActual !== 'todos' && m.tipo !== filtroMovActual) return;
+  const lista=document.getElementById('lista-movimientos');
+  refMovimientos.once('value').then(snap=>{
+    const todos=snap.val()||{}; lista.innerHTML='';
+    if(Object.keys(todos).length===0){lista.innerHTML='<p style="color:var(--textoSec);text-align:center;padding:20px;">Sin movimientos</p>';return;}
+    Object.entries(todos).reverse().forEach(([id,m])=>{
+      if(filtroMov!=='todos'&&m.tipo!==filtroMov)return;
       lista.innerHTML += `
         <div class="item ${m.tipo}">
-          <div>
-            <strong>${m.tipo==='ingreso'?'🟢':m.tipo==='gasto'?'🟠':'🟣'} ${m.descripcion}</strong><br>
-            <small style="color:var(--textoSec);">${m.fecha}</small>
-          </div>
-          <div class="fila" style="align-items:center;">
-            <div style="font-weight:bold; font-size:16px; margin-right:8px;">${m.tipo==='ingreso'?'+':'-'} $${m.monto.toLocaleString('es-AR')}</div>
-            <button class="btn-rojo" onclick="borrarMovimiento('${id}')" title="Eliminar">🗑️</button>
-          </div>
+          <div><strong>${m.tipo==='ingreso'?'🟢':m.tipo==='gasto'?'🟠':'🟣'} ${m.descripcion}</strong><br><small style="color:var(--textoSec);">${m.fecha}</small></div>
+          <div class="fila"><div style="font-weight:bold;">${m.tipo==='ingreso'?'+':'-'} $${m.monto.toLocaleString('es-AR')}</div><button class="btn-rojo" onclick="eliminarMov('${id}')">🗑️</button></div>
         </div>
       `;
     });
-    if(!lista.innerHTML) lista.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:20px;">Sin movimientos</p>';
   });
 }
 
-function cambiarFiltroMov(f){
-  filtroMovActual = f;
-  document.querySelectorAll('#tab-finanzas .filtro').forEach(b=>b.classList.remove('activo'));
-  event.target.classList.add('activo');
-  listarMovimientos();
-}
-
+function cambiarFiltroMov(f){filtroMov=f;document.querySelectorAll('#pestaña-finanzas .filtro').forEach(b=>b.classList.remove('activo'));event.target.classList.add('activo');listarMovimientos();}
 async function agregarMovimiento(){
-  const tipo = document.getElementById('tipoMov').value;
-  const desc = document.getElementById('descMov').value.trim();
-  const monto = parseInt(document.getElementById('montoMov').value);
-  const fecha = document.getElementById('fechaMov').value;
-  if(!desc||!monto||monto<=0||!fecha){ alert('⚠️ Completá todos los datos'); return; }
-  await refMovimientos.push({tipo, descripcion:desc, monto, fecha});
-  document.getElementById('descMov').value=''; document.getElementById('montoMov').value='';
-  alert('✅ Movimiento guardado');
+  const tipo=document.getElementById('sel-tipo-mov').value,desc=document.getElementById('desc-mov').value.trim(),monto=parseInt(document.getElementById('monto-mov').value),fecha=document.getElementById('fecha-mov').value;
+  if(!desc||!monto||monto<=0||!fecha){alert('⚠️ Completá todos los datos');return;}
+  await refMovimientos.push({tipo,descripcion:desc,monto,fecha});
+  document.getElementById('desc-mov').value='';document.getElementById('monto-mov').value='';alert('✅ Guardado');
 }
+async function eliminarMov(id){if(!confirm('¿Eliminar?'))return;await refMovimientos.child(id).remove();}
 
-async function borrarMovimiento(id){
-  if(!confirm('¿Eliminar este movimiento?\nSe actualizarán los totales automáticamente.')) return;
-  await refMovimientos.child(id).remove();
-  alert('✅ Movimiento eliminado');
-}
-
-// === BARBEROS Y HORARIOS INDIVIDUALES ===
-function listarBarberos(){
-  const lista = document.getElementById('listaBarberos');
-  lista.innerHTML = '';
-  config.barberos.forEach((b,i) => {
-    lista.innerHTML += `
-      <div class="item">
-        <strong>${b.nombre}</strong>
-        <div class="fila">
-          <button class="btn-gris btn-rojo" onclick="document.getElementById('selBarberoHorario').value='${b.nombre}'; cargarHorarioBarbero();">🕐 Horario</button>
-          <button class="btn-rojo btn-rojo" onclick="eliminarBarbero(${i})">🗑️ Eliminar</button>
-        </div>
-      </div>
-    `;
+// === BARBEROS + HORARIOS INDIVIDUALES ===
+function listarListaBarberos(){
+  const lista=document.getElementById('lista-barberos'); lista.innerHTML='';
+  configuracion.barberos.forEach((b,i)=>{
+    lista.innerHTML += `<div class="item"><strong>${b.nombre}</strong><div class="fila"><button class="btn-gris btn-rojo" onclick="document.getElementById('sel-barbero-horario').value='${b.nombre}';cargarFormularioHorario();">🕐 Horario</button><button class="btn-rojo btn-rojo" onclick="borrarBarbero(${i})">🗑️ Eliminar</button></div></div>`;
   });
 }
 
 async function agregarBarbero(){
-  const nom = document.getElementById('nuevoBarbero').value.trim();
-  if(!nom){ alert('⚠️ Escribí un nombre'); return; }
-  if(config.barberos.some(b => b.nombre === nom)){ alert('⚠️ Ya existe'); return; }
-  config.barberos.push(crearBarbero(nom));
-  await refConfig.set(config);
-  document.getElementById('nuevoBarbero').value='';
-  listarBarberos(); actualizarSelectores();
+  const nom=document.getElementById('nombre-nuevo-barbero').value.trim();
+  if(!nom){alert('⚠️ Escribí un nombre');return;}
+  if(configuracion.barberos.some(b=>b.nombre===nom)){alert('⚠️ Ya existe');return;}
+  configuracion.barberos.push(crearBarberoNuevo(nom)); await refConfig.set(configuracion);
+  document.getElementById('nombre-nuevo-barbero').value=''; listarListaBarberos(); actualizarListasSeleccion();
 }
 
-async function eliminarBarbero(i){
-  if(!confirm('¿Eliminar este barbero?\nSe eliminará de la lista pero no se borrarán los turnos ya reservados.')) return;
-  config.barberos.splice(i,1);
-  await refConfig.set(config);
-  listarBarberos(); actualizarSelectores();
-  document.getElementById('configHorarioBarbero').classList.add('oculto');
-}
+async function borrarBarbero(i){if(!confirm('¿Eliminar?'))return;configuracion.barberos.splice(i,1);await refConfig.set(configuracion);listarListaBarberos();actualizarListasSeleccion();document.getElementById('form-horario-barbero').classList.add('oculto');}
 
-// === EDITAR HORARIO INDIVIDUAL ===
-function cargarHorarioBarbero(){
-  const nombre = document.getElementById('selBarberoHorario').value;
-  if(!nombre){
-    document.getElementById('configHorarioBarbero').classList.add('oculto');
-    return;
-  }
-  barberoEditando = config.barberos.find(b => b.nombre === nombre);
-  if(!barberoEditando) return;
-  
-  document.getElementById('configHorarioBarbero').classList.remove('oculto');
-  const contenedor = document.getElementById('diasSemana');
-  contenedor.innerHTML = '';
-  
-  NOMBRES_DIAS.forEach(dia => {
-    const h = barberoEditando.horarios[dia];
-    contenedor.innerHTML += `
-      <div class="dia-semana ${h.activo?'':'descansa'}" id="dia-${dia}">
-        <label style="display:flex; align-items:center; margin:0; cursor:pointer;">
-          <input type="checkbox" class="chk-dia" id="chk-${dia}" ${h.activo?'checked':''} onchange="toggleDia('${dia}')">
-          <span class="etiqueta-dia">${dia}</span>
-        </label>
-        <div id="horas-${dia}" class="${h.activo?'':'oculto'}">
-          <div class="fila-horario">
-            <span style="font-size:12px; color:var(--textoSec); width:50px;">Mañana</span>
-            <input type="time" id="mañanaDesde-${dia}" value="${h.mañanaDesde||''}" placeholder="Desde">
-            <span style="color:var(--textoSec);">a</span>
-            <input type="time" id="mañanaHasta-${dia}" value="${h.mañanaHasta||''}" placeholder="Hasta">
-          </div>
-          <div class="fila-horario">
-            <span style="font-size:12px; color:var(--textoSec); width:50px;">Tarde</span>
-            <input type="time" id="tardeDesde-${dia}" value="${h.tardeDesde||''}" placeholder="Desde">
-            <span style="color:var(--textoSec);">a</span>
-            <input type="time" id="tardeHasta-${dia}" value="${h.tardeHasta||''}" placeholder="Hasta">
-          </div>
+function cargarFormularioHorario(){
+  const nom=document.getElementById('sel-barbero-horario').value;
+  if(!nom){document.getElementById('form-horario-barbero').classList.add('oculto');return;}
+  barberoEditando=configuracion.barberos.find(b=>b.nombre===nom);
+  document.getElementById('form-horario-barbero').classList.remove('oculto');
+  const cont=document.getElementById('contenedor-dias'); cont.innerHTML='';
+  DIAS_SEMANA.forEach(d=>{
+    const h=barberoEditando.horarios[d];
+    cont.innerHTML += `
+      <div class="dia-semana ${h.activo?'':'descansa'}" id="dia-${d}">
+        <label style="display:flex;align-items:center;margin:0;cursor:pointer;"><input type="checkbox" class="chk-dia" id="chk-${d}" ${h.activo?'checked':''} onchange="cambiarEstadoDia('${d}')"><span class="etiqueta-dia">${d}</span></label>
+        <div id="horas-${d}" class="${h.activo?'':'oculto'}">
+          <div class="fila-horario"><span style="font-size:12px;color:var(--textoSec);width:50px;">Mañana</span><input type="time" id="mañanaDesde-${d}" value="${h.mañanaDesde||''}"><span>a</span><input type="time" id="mañanaHasta-${d}" value="${h.mañanaHasta||''}"></div>
+          <div class="fila-horario"><span style="font-size:12px;color:var(--textoSec);width:50px;">Tarde</span><input type="time" id="tardeDesde-${d}" value="${h.tardeDesde||''}"><span>a</span><input type="time" id="tardeHasta-${d}" value="${h.tardeHasta||''}"></div>
         </div>
       </div>
     `;
   });
 }
 
-function toggleDia(dia){
-  const activo = document.getElementById(`chk-${dia}`).checked;
-  document.getElementById(`horas-${dia}`).classList.toggle('oculto', !activo);
-  document.getElementById(`dia-${dia}`).classList.toggle('descansa', !activo);
-}
+function cambiarEstadoDia(d){document.getElementById(`horas-${d}`).classList.toggle('oculto',!document.getElementById(`chk-${d}`).checked);document.getElementById(`dia-${d}`).classList.toggle('descansa',!document.getElementById(`chk-${d}`).checked);}
 
 async function guardarHorarioBarbero(){
-  if(!barberoEditando) return;
-  
-  NOMBRES_DIAS.forEach(dia => {
-    barberoEditando.horarios[dia].activo = document.getElementById(`chk-${dia}`).checked;
-    barberoEditando.horarios[dia].mañanaDesde = document.getElementById(`mañanaDesde-${dia}`).value;
-    barberoEditando.horarios[dia].mañanaHasta = document.getElementById(`mañanaHasta-${dia}`).value;
-    barberoEditando.horarios[dia].tardeDesde = document.getElementById(`tardeDesde-${dia}`).value;
-    barberoEditando.horarios[dia].tardeHasta = document.getElementById(`tardeHasta-${dia}`).value;
+  if(!barberoEditando)return;
+  DIAS_SEMANA.forEach(d=>{
+    barberoEditando.horarios[d].activo=document.getElementById(`chk-${d}`).checked;
+    barberoEditando.horarios[d].mañanaDesde=document.getElementById(`mañanaDesde-${d}`).value;
+    barberoEditando.horarios[d].mañanaHasta=document.getElementById(`mañanaHasta-${d}`).value;
+    barberoEditando.horarios[d].tardeDesde=document.getElementById(`tardeDesde-${d}`).value;
+    barberoEditando.horarios[d].tardeHasta=document.getElementById(`tardeHasta-${d}`).value;
   });
-  
-  await refConfig.set(config);
-  alert('✅ Horario guardado correctamente');
-  listarBarberos();
+  await refConfig.set(configuracion); alert('✅ Horario guardado'); listarListaBarberos();
 }
 
 // === SERVICIOS ===
-function listarServicios(){
-  const lista = document.getElementById('listaServicios');
-  lista.innerHTML = '';
-  config.servicios.forEach((s,i) => {
-    lista.innerHTML += `
-      <div class="item">
-        <strong>${s.nombre}</strong> — $${s.precio.toLocaleString('es-AR')}
-        <button class="btn-rojo" onclick="eliminarServicio(${i})">🗑️</button>
-      </div>
-    `;
-  });
+function listarListaServicios(){
+  const lista=document.getElementById('lista-servicios'); lista.innerHTML='';
+  configuracion.servicios.forEach((s,i)=>{lista.innerHTML += `<div class="item"><strong>${s.nombre}</strong> — $${s.precio.toLocaleString('es-AR')}<button class="btn-rojo" onclick="borrarServicio(${i})">🗑️</button></div>`;});
 }
 
 async function agregarServicio(){
-  const nom = document.getElementById('nuevoServicio').value.trim();
-  const precio = parseInt(document.getElementById('precioServicio').value);
-  if(!nom||!precio||precio<=0){ alert('⚠️ Completá nombre y precio'); return; }
-  config.servicios.push({nombre:nom, precio});
-  await refConfig.set(config);
-  document.getElementById('nuevoServicio').value=''; document.getElementById('precioServicio').value='';
-  listarServicios(); actualizarSelectores();
+  const nom=document.getElementById('nombre-nuevo-servicio').value.trim(),precio=parseInt(document.getElementById('precio-nuevo-servicio').value);
+  if(!nom||!precio||precio<=0){alert('⚠️ Completá nombre y precio');return;}
+  configuracion.servicios.push({nombre:nom,precio}); await refConfig.set(configuracion);
+  document.getElementById('nombre-nuevo-servicio').value='';document.getElementById('precio-nuevo-servicio').value='';
+  listarListaServicios(); actualizarListasSeleccion();
 }
 
-async function eliminarServicio(i){
-  if(!confirm('¿Eliminar este servicio?')) return;
-  config.servicios.splice(i,1);
-  await refConfig.set(config);
-  listarServicios(); actualizarSelectores();
-}
+async function borrarServicio(i){if(!confirm('¿Eliminar?'))return;configuracion.servicios.splice(i,1);await refConfig.set(configuracion);listarListaServicios();actualizarListasSeleccion();}
 
 // === AJUSTES ===
 async function guardarAjustes(){
-  const wa = document.getElementById('waBarberia').value.trim();
-  const pass = document.getElementById('nuevaPass').value.trim();
-  if(wa) config.whatsapp = wa.replace(/\D/g,'');
-  if(pass) config.contrasena = pass;
-  await refConfig.set(config);
-  document.getElementById('nuevaPass').value='';
-  alert('✅ Configuración guardada');
+  const linkMP=document.getElementById('link-mercadopago').value.trim();
+  const wa=document.getElementById('numero-whatsapp').value.trim();
+  const passNueva=document.getElementById('nueva-pass-admin').value.trim();
+  configuracion.linkMercadoPago=linkMP; configuracion.whatsapp=wa;
+  if(passNueva) configuracion.contrasena=passNueva;
+  await refConfig.set(configuracion); alert('✅ Guardado!'); irA('reservar');
 }
-
 </script>
 </body>
 </html>
