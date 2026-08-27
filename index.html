@@ -12,7 +12,7 @@
             --whatsapp: #25D366;
             --texto: #E8E8F0; --textoSec: #9CA0C2; --borde: rgba(212,175,55,0.2);
         }
-        body{background:var(--fondo); color:var(--texto); min-height:100vh; padding:20px 16px; max-width:500px; margin:0 auto;}
+        body{background:var(--fondo); color:var(--texto); min-height:100vh; padding:20px 16px; max-width:520px; margin:0 auto;}
         .cabecera{text-align:center; padding:20px; margin-bottom:20px;}
         h1{color:var(--dorado); font-size:32px; letter-spacing:4px;}
         .subtitulo{color:var(--textoSec); font-size:14px; margin-top:4px;}
@@ -20,7 +20,7 @@
         .caja{background:var(--fondoTarjeta); padding:24px; border-radius:12px; margin-bottom:16px; border:1px solid var(--borde);}
         h2{color:var(--dorado); font-size:18px; margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid var(--borde);}
         h3{color:var(--doradoClaro); font-size:15px; margin:20px 0 10px;}
-        label{display:block; margin:16px 0 6px; color:var(--textoSec); font-size:13px;}
+        label{display:block; margin:12px 0 6px; color:var(--textoSec); font-size:13px;}
         input, select, button{width:100%; padding:12px 14px; border:none; border-radius:8px; font-size:15px;}
         input, select{background:var(--fondoSec); color:var(--texto); border:2px solid transparent;}
         input:focus, select:focus{border-color:var(--dorado); outline:none;}
@@ -33,6 +33,8 @@
         .fila{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
         .fila-doble{display:flex; gap:10px; flex-wrap:wrap;}
         .fila-doble > *{flex:1; min-width:130px;}
+        .fila-triple{display:flex; gap:8px; flex-wrap:wrap;}
+        .fila-triple > *{flex:1; min-width:100px;}
         .item{display:flex; justify-content:space-between; align-items:center; padding:14px; background:var(--fondoSec); border-radius:10px; margin-bottom:8px; border-left:3px solid var(--dorado); flex-wrap:wrap; gap:8px;}
         .item.atendido{border-left-color:var(--exito); opacity:0.7;}
         .item.ingreso{border-left-color:var(--exito);}
@@ -58,6 +60,12 @@
         .aviso.error{color:var(--alerta);}
         .divisor{height:1px; background:var(--borde); margin:20px 0;}
         .etiqueta-atendido{background:var(--exito); color:#fff; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px;}
+        .dia-semana{background:var(--fondoSec); padding:12px; border-radius:8px; margin-bottom:8px; border-left:3px solid var(--dorado);}
+        .dia-semana.descansa{opacity:0.6; border-left-color:var(--alerta);}
+        .chk-dia{width:auto; margin:0; margin-right:8px;}
+        .fila-horario{display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap;}
+        .fila-horario input{width:80px; padding:8px 6px; text-align:center;}
+        .etiqueta-dia{font-weight:600; color:var(--doradoClaro);}
     </style>
 </head>
 <body>
@@ -174,7 +182,7 @@
                 <input type="date" id="fechaMov">
                 <button class="btn btn-dorado" onclick="agregarMovimiento()">💾 Guardar</button>
                 <div class="divisor"></div>
-                <h3>📊 Historial</h3>
+                <h3>📊 Historial — Eliminar si te equivocaste</h3>
                 <div class="filtros">
                     <button class="filtro activo" onclick="cambiarFiltroMov('todos')">Todos</button>
                     <button class="filtro" onclick="cambiarFiltroMov('ingreso')">🟢 Ingresos</button>
@@ -185,12 +193,26 @@
             </div>
         </div>
 
-        <!-- BARBEROS -->
+        <!-- BARBEROS + HORARIOS INDIVIDUALES -->
         <div id="tab-barberos" class="oculto">
             <div class="caja">
                 <h3>Agregar Barbero</h3>
                 <input type="text" id="nuevoBarbero" placeholder="Nombre del barbero">
                 <button class="btn btn-dorado" onclick="agregarBarbero()">➕ Agregar</button>
+                <div class="divisor"></div>
+                <h3>🧑‍💼 Barberos y Horarios</h3>
+                <p style="color:var(--textoSec); font-size:13px; margin-bottom:16px;">Seleccioná un barbero para configurar su horario</p>
+                <label>Editar horario de:</label>
+                <select id="selBarberoHorario" onchange="cargarHorarioBarbero()">
+                    <option value="">— Elegí barbero —</option>
+                </select>
+                <div id="configHorarioBarbero" class="oculto" style="margin-top:20px;">
+                    <h3>📅 Horario Semanal</h3>
+                    <p style="color:var(--textoSec); font-size:12px; margin-bottom:12px;">Marcá los días que trabaja y configurá los horarios</p>
+                    <div id="diasSemana"></div>
+                    <button class="btn btn-dorado" onclick="guardarHorarioBarbero()">💾 Guardar Horario</button>
+                </div>
+                <div class="divisor"></div>
                 <h3>Lista de Barberos</h3>
                 <div id="listaBarberos"></div>
             </div>
@@ -213,7 +235,7 @@
         <!-- AJUSTES -->
         <div id="tab-ajustes" class="oculto">
             <div class="caja">
-                <h3>⚙️ Configuración</h3>
+                <h3>⚙️ Configuración General</h3>
                 <label>WhatsApp de la Barbería (sin espacios ni símbolos)</label>
                 <input type="tel" id="waBarberia" value="5492984548329">
                 <label>Contraseña de Admin</label>
@@ -245,11 +267,25 @@ const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
 const refMovimientos = db.ref('movimientos');
 
+// DÍAS DE LA SEMANA
+const NOMBRES_DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const DIAS_NUM = {Lunes:1,Martes:2,Miércoles:3,Jueves:4,Viernes:5,Sábado:6,Domingo:0};
+
 // DATOS POR DEFECTO
 let config = {
   contrasena: 'admin123',
   whatsapp: '5492984548329',
-  barberos: ['Nico'],
+  barberos: [
+    {nombre: 'Nico', horarios: {
+      Lunes: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
+      Martes: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
+      Miércoles: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
+      Jueves: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
+      Viernes: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'21:00'},
+      Sábado: {activo:true, mañanaDesde:'09:00', mañanaHasta:'12:00', tardeDesde:'15:00', tardeHasta:'20:00'},
+      Domingo: {activo:false, mañanaDesde:'', mañanaHasta:'', tardeDesde:'', tardeHasta:''}
+    }}
+  ],
   servicios: [
     {nombre: 'Corte de cabello', precio: 5000},
     {nombre: 'Arreglo de barba', precio: 3500},
@@ -259,12 +295,34 @@ let config = {
 };
 
 let filtroActual = 'todos', filtroMovActual = 'todos', paginaActual = 'reservar';
+let barberoEditando = null;
 
 // CARGA CONFIGURACIÓN
 refConfig.on('value', snap => {
-  if(snap.exists()) config = {...config, ...snap.val()};
+  if(snap.exists()) {
+    const datos = snap.val();
+    config = {...config, ...datos};
+    // Convertir barberos de formato simple a objeto completo si viene como array de nombres
+    if(config.barberos.length > 0 && typeof config.barberos[0] === 'string') {
+      config.barberos = config.barberos.map(n => crearBarbero(n));
+    }
+  }
   actualizarSelectores();
 });
+
+function crearBarbero(nombre){
+  const horarios = {};
+  NOMBRES_DIAS.forEach(d => {
+    horarios[d] = {
+      activo: d !== 'Domingo',
+      mañanaDesde:'09:00', mañanaHasta:'12:00',
+      tardeDesde:'15:00', tardeHasta:'21:00'
+    };
+  });
+  horarios.Domingo.activo = false;
+  horarios.Sábado.tardeHasta = '20:00';
+  return {nombre, horarios};
+}
 
 actualizarSelectores();
 
@@ -296,11 +354,16 @@ function ingresar(){
 
 function actualizarSelectores(){
   const selB = document.getElementById('selBarbero');
+  const selBH = document.getElementById('selBarberoHorario');
   const selS = document.getElementById('selServicio');
   if(!selB || !selS) return;
   selB.innerHTML = '<option value="">— Seleccionar barbero —</option>';
+  selBH.innerHTML = '<option value="">— Elegí barbero —</option>';
+  config.barberos.forEach(b => {
+    selB.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
+    selBH.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
+  });
   selS.innerHTML = '<option value="">— Seleccionar servicio —</option>';
-  config.barberos.forEach(b => selB.innerHTML += `<option value="${b}">${b}</option>`);
   config.servicios.forEach(s => selS.innerHTML += `<option value="${s.nombre}||${s.precio}">${s.nombre} — $${s.precio.toLocaleString('es-AR')}</option>`);
 }
 
@@ -310,30 +373,81 @@ function cambiarTab(nombre){
   ['turnos','finanzas','barberos','servicios','ajustes'].forEach(t=>document.getElementById('tab-'+t).classList.add('oculto'));
   document.getElementById('tab-'+nombre).classList.remove('oculto');
   if(nombre === 'finanzas'){ calcularTotales(); listarMovimientos(); document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0]; }
+  if(nombre === 'barberos'){ listarBarberos(); }
+}
+
+// === GENERAR HORARIOS SEGÚN EL HORARIO INDIVIDUAL DEL BARBERO ===
+function generarHorariosDesdeConfig(horarioDia){
+  const horarios = [];
+  if(!horarioDia || !horarioDia.activo) return horarios;
+  
+  // Horarios de la mañana
+  if(horarioDia.mañanaDesde && horarioDia.mañanaHasta){
+    let h = horarioDia.mañanaDesde;
+    while(h <= horarioDia.mañanaHasta){
+      horarios.push(h);
+      h = sumarMediaHora(h);
+    }
+  }
+  // Horarios de la tarde
+  if(horarioDia.tardeDesde && horarioDia.tardeHasta){
+    let h = horarioDia.tardeDesde;
+    while(h <= horarioDia.tardeHasta){
+      horarios.push(h);
+      h = sumarMediaHora(h);
+    }
+  }
+  return horarios;
+}
+
+function sumarMediaHora(hora){
+  let [h,m] = hora.split(':').map(Number);
+  m += 30;
+  if(m >= 60){ h++; m -= 60; }
+  return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
 }
 
 async function cargarHorarios(){
-  const barbero = document.getElementById('selBarbero').value;
+  const nombreBarbero = document.getElementById('selBarbero').value;
   const fecha = document.getElementById('selFecha').value;
   const selH = document.getElementById('selHora');
   const aviso = document.getElementById('avisoHorario');
   selH.innerHTML = '<option value="">— Elegí horario —</option>';
   aviso.classList.add('oculto');
-  if(!barbero || !fecha) return;
+  if(!nombreBarbero || !fecha) return;
+  
+  // Obtener el día de la semana
+  const fechaObj = new Date(fecha);
+  const nombreDia = NOMBRES_DIAS[fechaObj.getDay()];
+  
+  // Buscar el barbero y su horario para ese día
+  const barbero = config.barberos.find(b => b.nombre === nombreBarbero);
+  if(!barbero) return;
+  
+  const horarioDia = barbero.horarios[nombreDia];
+  if(!horarioDia || !horarioDia.activo){
+    selH.innerHTML = '<option value="">❌ '+nombreBarbero+' no trabaja este día</option>';
+    return;
+  }
+  
+  // Generar todos los horarios disponibles para ese día
+  const todosHorarios = generarHorariosDesdeConfig(horarioDia);
   
   try {
     const snap = await refTurnos.once('value');
     const todos = snap.val() || {};
-    const ocupados = Object.values(todos).filter(t => !t.atendido && t.barbero === barbero && t.fecha === fecha).map(t => t.hora);
-    const horarios = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30'];
-    horarios.forEach(h => { if(!ocupados.includes(h)) selH.innerHTML += `<option value="${h}">${h}</option>`; });
+    const ocupados = Object.values(todos).filter(t => !t.atendido && t.barbero === nombreBarbero && t.fecha === fecha).map(t => t.hora);
+    
+    todosHorarios.forEach(h => {
+      if(!ocupados.includes(h)) selH.innerHTML += `<option value="${h}">${h}</option>`;
+    });
     if(selH.options.length === 1) selH.innerHTML = '<option value="">❌ No hay horarios disponibles</option>';
   } catch {
     aviso.classList.remove('oculto'); aviso.textContent = '⚠️ Sin conexión — intenta nuevamente'; aviso.classList.add('error');
   }
 }
 
-// === CONFIRMAR TURNO + INGRESO AUTOMÁTICO ===
+// === CONFIRMAR TURNO + INGRESO AUTOMÁTICO EN FINANZAS ===
 async function confirmarTurno(){
   const nombre = document.getElementById('inpNombre').value.trim();
   const barbero = document.getElementById('selBarbero').value;
@@ -381,134 +495,261 @@ function volver(){
   document.getElementById('selBarbero').value='';
   document.getElementById('selServicio').value='';
   document.getElementById('selFecha').value='';
-  document.getElementById('selHora').innerHTML='<option value="">— Elegí primero barbero y fecha —</option>';
-  document.getElementById('inpTel').value='';
+  document.getElementById('selHora').value='';
 }
 
-// === TURNOS ===
-function cambiarFiltro(f){ filtroActual = f; document.querySelectorAll('#tab-turnos .filtro').forEach(b=>b.classList.remove('activo')); event.target.classList.add('activo'); listarTurnos(); }
+// === LISTAR TURNOS ===
+refTurnos.on('value', snap => { listarTurnos(); });
 
-async function listarTurnos(){
-  const c = document.getElementById('listaTurnos');
-  try {
-    const snap = await refTurnos.once('value');
-    const datos = snap.val() || {};
-    let turnos = Object.entries(datos).map(([id,t])=>({...t,id}));
-    if(turnos.length===0){ c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:20px;">No hay turnos registrados</p>'; return; }
-    turnos.sort((a,b)=>new Date(b.fecha+'T'+b.hora)-new Date(a.fecha+'T'+a.hora));
-    if(filtroActual==='pendientes') turnos=turnos.filter(t=>!t.atendido);
-    if(filtroActual==='atendidos') turnos=turnos.filter(t=>t.atendido);
-    c.innerHTML='';
-    turnos.forEach(t=>{
-      c.innerHTML += `<div class="item ${t.atendido?'atendido':''}">
-        <div><strong>${t.nombre}</strong>${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br><small style="color:var(--textoSec)">${t.barbero} · ${t.servicio} · ${t.fecha} ${t.hora} · $${(t.precio||0).toLocaleString('es-AR')}</small></div>
-        <div class="fila">${!t.atendido?`<button class="btn btn-verde" onclick="marcarAtendido('${t.id}')">✅ Atendido</button>`:`<button class="btn btn-gris" onclick="desmarcarAtendido('${t.id}')">↩️ Deshacer</button>`}<button class="btn btn-rojo" onclick="borrarTurno('${t.id}')">🗑️</button></div>
-      </div>`;
+function listarTurnos(){
+  const lista = document.getElementById('listaTurnos');
+  refTurnos.once('value').then(snap => {
+    const todos = snap.val() || {};
+    lista.innerHTML = '';
+    Object.entries(todos).reverse().forEach(([id, t]) => {
+      if(filtroActual === 'pendientes' && t.atendido) return;
+      if(filtroActual === 'atendidos' && !t.atendido) return;
+      lista.innerHTML += `
+        <div class="item ${t.atendido?'atendido':''}">
+          <div>
+            <strong>${t.hora} — ${t.nombre}</strong>
+            ${t.atendido?'<span class="etiqueta-atendido">✅ ATENDIDO</span>':''}<br>
+            <small style="color:var(--textoSec);">${t.barbero} · ${t.servicio} · ${t.fecha} · $${t.precio.toLocaleString('es-AR')}</small>
+          </div>
+          <div class="fila">
+            ${!t.atendido?`<button class="btn-verde btn-rojo" onclick="marcarAtendido('${id}')">✅ Listo</button>`:`<button class="btn-gris btn-rojo" onclick="desmarcar('${id}')">↩️ Deshacer</button>`}
+            <button class="btn-rojo btn-rojo" onclick="borrarTurno('${id}')">🗑️</button>
+            <a href="https://wa.me/${t.telefono.replace(/\D/g,'')}" target="_blank" class="btn-verde btn-rojo">💬</a>
+          </div>
+        </div>
+      `;
     });
-  } catch { c.innerHTML='<p style="color:var(--alerta); text-align:center; padding:20px;">❌ Error al cargar</p>'; }
+    if(!lista.innerHTML) lista.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:20px;">No hay turnos</p>';
+  });
 }
 
-async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); listarTurnos(); }
-async function desmarcarAtendido(id){ await refTurnos.child(id).update({atendido:false}); listarTurnos(); }
-async function borrarTurno(id){ if(!confirm('¿Eliminar este turno?')) return; await refTurnos.child(id).remove(); listarTurnos(); }
-
-// === BARBEROS ===
-async function agregarBarbero(){
-  const nom = document.getElementById('nuevoBarbero').value.trim();
-  if(!nom || config.barberos.includes(nom)) return;
-  config.barberos.push(nom); await refConfig.update({barberos:config.barberos});
-  document.getElementById('nuevoBarbero').value=''; listarBarberos(); actualizarSelectores();
+function cambiarFiltro(f){
+  filtroActual = f;
+  document.querySelectorAll('.filtro').forEach(b=>b.classList.remove('activo'));
+  event.target.classList.add('activo');
+  listarTurnos();
 }
-async function eliminarBarbero(n){ if(!confirm(`¿Eliminar a "${n}"?`)) return; config.barberos=config.barberos.filter(b=>b!==n); await refConfig.update({barberos:config.barberos}); listarBarberos(); actualizarSelectores(); }
-function listarBarberos(){ const c=document.getElementById('listaBarberos'); c.innerHTML=''; config.barberos.forEach(b=>c.innerHTML+=`<div class="item"><span>${b}</span><button class="btn btn-rojo" onclick="eliminarBarbero('${b}')">🗑️</button></div>`); }
 
-// === SERVICIOS ===
-async function agregarServicio(){
-  const nom = document.getElementById('nuevoServicio').value.trim();
-  const pre = parseInt(document.getElementById('precioServicio').value);
-  if(!nom||!pre) return; config.servicios.push({nombre:nom,precio:pre}); await refConfig.update({servicios:config.servicios});
-  document.getElementById('nuevoServicio').value=''; document.getElementById('precioServicio').value=''; listarServicios(); actualizarSelectores();
-}
-async function eliminarServicio(i){ if(!confirm('¿Eliminar servicio?')) return; config.servicios.splice(i,1); await refConfig.update({servicios:config.servicios}); listarServicios(); actualizarSelectores(); }
-function listarServicios(){ const c=document.getElementById('listaServicios'); c.innerHTML=''; config.servicios.forEach((s,i)=>c.innerHTML+=`<div class="item"><span>${s.nombre} — $${s.precio.toLocaleString('es-AR')}</span><button class="btn btn-rojo" onclick="eliminarServicio(${i})">🗑️</button></div>`); }
-
-// === AJUSTES ===
-async function guardarAjustes(){
-  config.whatsapp = document.getElementById('waBarberia').value.replace(/\D/g,'');
-  const nuevaPass = document.getElementById('nuevaPass').value.trim();
-  if(nuevaPass) config.contrasena = nuevaPass;
-  await refConfig.update({whatsapp:config.whatsapp, contrasena:config.contrasena});
-  alert('✅ Guardado correctamente');
-}
+async function marcarAtendido(id){ await refTurnos.child(id).update({atendido:true}); }
+async function desmarcar(id){ await refTurnos.child(id).update({atendido:false}); }
+async function borrarTurno(id){ if(!confirm('¿Eliminar este turno?')) return; await refTurnos.child(id).remove(); }
 
 // === FINANZAS ===
+refMovimientos.on('value', snap => {
+  if(paginaActual === 'admin' && document.getElementById('tab-finanzas') && !document.getElementById('tab-finanzas').classList.contains('oculto')){
+    calcularTotales(); listarMovimientos();
+  }
+});
+
+function calcularTotales(){
+  refMovimientos.once('value').then(snap => {
+    const todos = snap.val() || {};
+    let ing=0, gas=0, inv=0;
+    Object.values(todos).forEach(m => {
+      if(m.tipo==='ingreso') ing+=m.monto;
+      else if(m.tipo==='gasto') gas+=m.monto;
+      else if(m.tipo==='inversion') inv+=m.monto;
+    });
+    document.getElementById('totalIngresos').textContent = '$'+ing.toLocaleString('es-AR');
+    document.getElementById('totalGastos').textContent = '$'+gas.toLocaleString('es-AR');
+    document.getElementById('totalInversion').textContent = '$'+inv.toLocaleString('es-AR');
+    document.getElementById('saldoTotal').textContent = '$'+(ing-gas-inv).toLocaleString('es-AR');
+  });
+}
+
+function listarMovimientos(){
+  const lista = document.getElementById('listaMovimientos');
+  refMovimientos.once('value').then(snap => {
+    const todos = snap.val() || {};
+    lista.innerHTML = '';
+    Object.entries(todos).reverse().forEach(([id, m]) => {
+      if(filtroMovActual !== 'todos' && m.tipo !== filtroMovActual) return;
+      lista.innerHTML += `
+        <div class="item ${m.tipo}">
+          <div>
+            <strong>${m.tipo==='ingreso'?'🟢':m.tipo==='gasto'?'🟠':'🟣'} ${m.descripcion}</strong><br>
+            <small style="color:var(--textoSec);">${m.fecha}</small>
+          </div>
+          <div class="fila" style="align-items:center;">
+            <div style="font-weight:bold; font-size:16px; margin-right:8px;">${m.tipo==='ingreso'?'+':'-'} $${m.monto.toLocaleString('es-AR')}</div>
+            <button class="btn-rojo" onclick="borrarMovimiento('${id}')" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+    if(!lista.innerHTML) lista.innerHTML = '<p style="color:var(--textoSec); text-align:center; padding:20px;">Sin movimientos</p>';
+  });
+}
+
+function cambiarFiltroMov(f){
+  filtroMovActual = f;
+  document.querySelectorAll('#tab-finanzas .filtro').forEach(b=>b.classList.remove('activo'));
+  event.target.classList.add('activo');
+  listarMovimientos();
+}
+
 async function agregarMovimiento(){
   const tipo = document.getElementById('tipoMov').value;
   const desc = document.getElementById('descMov').value.trim();
   const monto = parseInt(document.getElementById('montoMov').value);
   const fecha = document.getElementById('fechaMov').value;
-  if(!desc||!monto||!fecha){ alert('⚠️ Completar todos los campos'); return; }
+  if(!desc||!monto||monto<=0||!fecha){ alert('⚠️ Completá todos los datos'); return; }
   await refMovimientos.push({tipo, descripcion:desc, monto, fecha});
   document.getElementById('descMov').value=''; document.getElementById('montoMov').value='';
-  calcularTotales(); listarMovimientos();
+  alert('✅ Movimiento guardado');
 }
 
 async function borrarMovimiento(id){
-  if(!confirm('¿Eliminar este movimiento?')) return;
-  try {
-    await refMovimientos.child(id).remove();
-    calcularTotales();
-    listarMovimientos();
-  } catch(e) {
-    console.error('Error al eliminar:', e);
-    alert('❌ No se pudo eliminar. Intenta nuevamente.');
+  if(!confirm('¿Eliminar este movimiento?\nSe actualizarán los totales automáticamente.')) return;
+  await refMovimientos.child(id).remove();
+  alert('✅ Movimiento eliminado');
+}
+
+// === BARBEROS Y HORARIOS INDIVIDUALES ===
+function listarBarberos(){
+  const lista = document.getElementById('listaBarberos');
+  lista.innerHTML = '';
+  config.barberos.forEach((b,i) => {
+    lista.innerHTML += `
+      <div class="item">
+        <strong>${b.nombre}</strong>
+        <div class="fila">
+          <button class="btn-gris btn-rojo" onclick="document.getElementById('selBarberoHorario').value='${b.nombre}'; cargarHorarioBarbero();">🕐 Horario</button>
+          <button class="btn-rojo btn-rojo" onclick="eliminarBarbero(${i})">🗑️ Eliminar</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function agregarBarbero(){
+  const nom = document.getElementById('nuevoBarbero').value.trim();
+  if(!nom){ alert('⚠️ Escribí un nombre'); return; }
+  if(config.barberos.some(b => b.nombre === nom)){ alert('⚠️ Ya existe'); return; }
+  config.barberos.push(crearBarbero(nom));
+  await refConfig.set(config);
+  document.getElementById('nuevoBarbero').value='';
+  listarBarberos(); actualizarSelectores();
+}
+
+async function eliminarBarbero(i){
+  if(!confirm('¿Eliminar este barbero?\nSe eliminará de la lista pero no se borrarán los turnos ya reservados.')) return;
+  config.barberos.splice(i,1);
+  await refConfig.set(config);
+  listarBarberos(); actualizarSelectores();
+  document.getElementById('configHorarioBarbero').classList.add('oculto');
+}
+
+// === EDITAR HORARIO INDIVIDUAL ===
+function cargarHorarioBarbero(){
+  const nombre = document.getElementById('selBarberoHorario').value;
+  if(!nombre){
+    document.getElementById('configHorarioBarbero').classList.add('oculto');
+    return;
   }
+  barberoEditando = config.barberos.find(b => b.nombre === nombre);
+  if(!barberoEditando) return;
+  
+  document.getElementById('configHorarioBarbero').classList.remove('oculto');
+  const contenedor = document.getElementById('diasSemana');
+  contenedor.innerHTML = '';
+  
+  NOMBRES_DIAS.forEach(dia => {
+    const h = barberoEditando.horarios[dia];
+    contenedor.innerHTML += `
+      <div class="dia-semana ${h.activo?'':'descansa'}" id="dia-${dia}">
+        <label style="display:flex; align-items:center; margin:0; cursor:pointer;">
+          <input type="checkbox" class="chk-dia" id="chk-${dia}" ${h.activo?'checked':''} onchange="toggleDia('${dia}')">
+          <span class="etiqueta-dia">${dia}</span>
+        </label>
+        <div id="horas-${dia}" class="${h.activo?'':'oculto'}">
+          <div class="fila-horario">
+            <span style="font-size:12px; color:var(--textoSec); width:50px;">Mañana</span>
+            <input type="time" id="mañanaDesde-${dia}" value="${h.mañanaDesde||''}" placeholder="Desde">
+            <span style="color:var(--textoSec);">a</span>
+            <input type="time" id="mañanaHasta-${dia}" value="${h.mañanaHasta||''}" placeholder="Hasta">
+          </div>
+          <div class="fila-horario">
+            <span style="font-size:12px; color:var(--textoSec); width:50px;">Tarde</span>
+            <input type="time" id="tardeDesde-${dia}" value="${h.tardeDesde||''}" placeholder="Desde">
+            <span style="color:var(--textoSec);">a</span>
+            <input type="time" id="tardeHasta-${dia}" value="${h.tardeHasta||''}" placeholder="Hasta">
+          </div>
+        </div>
+      </div>
+    `;
+  });
 }
 
-async function calcularTotales(){
-  try {
-    const snap = await refMovimientos.once('value');
-    const movs = Object.values(snap.val() || {});
-    let ing=0, gas=0, inv=0;
-    movs.forEach(m=>{
-      if(m.tipo==='ingreso') ing+=m.monto;
-      else if(m.tipo==='gasto') gas+=m.monto;
-      else if(m.tipo==='inversion') inv+=m.monto;
-    });
-    document.getElementById('totalIngresos').textContent='$'+ing.toLocaleString('es-AR');
-    document.getElementById('totalGastos').textContent='$'+gas.toLocaleString('es-AR');
-    document.getElementById('totalInversion').textContent='$'+inv.toLocaleString('es-AR');
-    const saldo=ing-gas-inv;
-    document.getElementById('saldoTotal').textContent='$'+saldo.toLocaleString('es-AR');
-    document.getElementById('saldoTotal').style.color=saldo>=0?'var(--exito)':'var(--alerta)';
-  } catch {}
+function toggleDia(dia){
+  const activo = document.getElementById(`chk-${dia}`).checked;
+  document.getElementById(`horas-${dia}`).classList.toggle('oculto', !activo);
+  document.getElementById(`dia-${dia}`).classList.toggle('descansa', !activo);
 }
 
-function cambiarFiltroMov(f){ filtroMovActual=f; document.querySelectorAll('#tab-finanzas .filtro').forEach(b=>b.classList.remove('activo')); event.target.classList.add('activo'); listarMovimientos(); }
-
-async function listarMovimientos(){
-  const c=document.getElementById('listaMovimientos');
-  try {
-    const snap = await refMovimientos.once('value');
-    let movs = Object.entries(snap.val() || {}).map(([id,m])=>({...m,id}));
-    if(movs.length===0){ c.innerHTML='<p style="color:var(--textoSec); text-align:center; padding:20px;">Sin movimientos registrados</p>'; return; }
-    movs.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-    if(filtroMovActual!=='todos') movs=movs.filter(m=>m.tipo===filtroMovActual);
-    c.innerHTML='';
-    movs.forEach(m=>{
-      const icon = m.tipo==='ingreso'?'🟢':m.tipo==='gasto'?'🟠':'🟣';
-      c.innerHTML += `<div class="item ${m.tipo}">
-        <div><strong>${icon} ${m.descripcion}</strong><br><small style="color:var(--textoSec)">${m.fecha}</small></div>
-        <div class="fila"><strong>${m.tipo==='ingreso'?'+':'-'} $${m.monto.toLocaleString('es-AR')}</strong><button class="btn btn-rojo" onclick="borrarMovimiento('${m.id}')">🗑️ Eliminar</button></div>
-      </div>`;
-    });
-  } catch { c.innerHTML='<p style="color:var(--alerta); text-align:center; padding:20px;">❌ Error al cargar</p>'; }
+async function guardarHorarioBarbero(){
+  if(!barberoEditando) return;
+  
+  NOMBRES_DIAS.forEach(dia => {
+    barberoEditando.horarios[dia].activo = document.getElementById(`chk-${dia}`).checked;
+    barberoEditando.horarios[dia].mañanaDesde = document.getElementById(`mañanaDesde-${dia}`).value;
+    barberoEditando.horarios[dia].mañanaHasta = document.getElementById(`mañanaHasta-${dia}`).value;
+    barberoEditando.horarios[dia].tardeDesde = document.getElementById(`tardeDesde-${dia}`).value;
+    barberoEditando.horarios[dia].tardeHasta = document.getElementById(`tardeHasta-${dia}`).value;
+  });
+  
+  await refConfig.set(config);
+  alert('✅ Horario guardado correctamente');
+  listarBarberos();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('selFecha').min = new Date().toISOString().split('T')[0];
-  document.getElementById('fechaMov').value = new Date().toISOString().split('T')[0];
-});
+// === SERVICIOS ===
+function listarServicios(){
+  const lista = document.getElementById('listaServicios');
+  lista.innerHTML = '';
+  config.servicios.forEach((s,i) => {
+    lista.innerHTML += `
+      <div class="item">
+        <strong>${s.nombre}</strong> — $${s.precio.toLocaleString('es-AR')}
+        <button class="btn-rojo" onclick="eliminarServicio(${i})">🗑️</button>
+      </div>
+    `;
+  });
+}
+
+async function agregarServicio(){
+  const nom = document.getElementById('nuevoServicio').value.trim();
+  const precio = parseInt(document.getElementById('precioServicio').value);
+  if(!nom||!precio||precio<=0){ alert('⚠️ Completá nombre y precio'); return; }
+  config.servicios.push({nombre:nom, precio});
+  await refConfig.set(config);
+  document.getElementById('nuevoServicio').value=''; document.getElementById('precioServicio').value='';
+  listarServicios(); actualizarSelectores();
+}
+
+async function eliminarServicio(i){
+  if(!confirm('¿Eliminar este servicio?')) return;
+  config.servicios.splice(i,1);
+  await refConfig.set(config);
+  listarServicios(); actualizarSelectores();
+}
+
+// === AJUSTES ===
+async function guardarAjustes(){
+  const wa = document.getElementById('waBarberia').value.trim();
+  const pass = document.getElementById('nuevaPass').value.trim();
+  if(wa) config.whatsapp = wa.replace(/\D/g,'');
+  if(pass) config.contrasena = pass;
+  await refConfig.set(config);
+  document.getElementById('nuevaPass').value='';
+  alert('✅ Configuración guardada');
+}
+
 </script>
 </body>
 </html>
