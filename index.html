@@ -57,12 +57,14 @@
         .tab{padding:10px 12px; color:var(--textoSec); cursor:pointer; border-bottom:2px solid transparent; font-size:13px; white-space:nowrap;}
         .tab.activo{color:var(--doradoClaro); border-bottom-color:var(--dorado);}
         .btn-admin{position:fixed; top:12px; right:12px; background:var(--fondoTarjeta); border:1px solid var(--borde); color:var(--dorado); font-size:20px; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100;}
+        .aviso{color:#FBBF24; font-size:13px; margin-top:8px;}
+        .aviso.error{color:var(--alerta);}
         .divisor{height:1px; background:var(--borde); margin:20px 0;}
         .etiqueta-atendido{background:var(--exito); color:#fff; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px;}
         .etiqueta-pagado{background:var(--mercadopago); color:#fff; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px;}
         .dia-semana{background:var(--fondoSec); padding:12px; border-radius:8px; margin-bottom:8px; border-left:3px solid var(--dorado);}
         .dia-semana.descansa{opacity:0.6; border-left-color:var(--alerta);}
-        .chk-dia{width:auto; margin:0 8px 0 0; cursor:pointer;}
+        .chk-dia{width:auto; margin:0; margin-right:8px; cursor:pointer;}
         .fila-horario{display:flex; gap:6px; align-items:center; margin-top:8px; flex-wrap:wrap;}
         .fila-horario input{width:80px; padding:8px 6px; text-align:center;}
         .etiqueta-dia{font-weight:600; color:var(--doradoClaro);}
@@ -78,6 +80,7 @@
     <p class="subtitulo">BARBERÍA</p>
 </div>
 
+<!-- PÁGINA DE RESERVAS -->
 <div id="pagina-reservar">
     <div class="caja">
         <h2>📅 Reservar Turno</h2>
@@ -99,9 +102,10 @@
             <select id="sel-hora">
                 <option value="">— Elegí primero barbero y fecha —</option>
             </select>
+            <p id="aviso-horario" class="aviso oculto"></p>
 
             <label>Tu Nombre</label>
-            <input type="text" id="inp-nombre" placeholder="Escribí tu nombre completo">
+            <input type="text" id="inp-nombre" placeholder="Tu nombre completo">
 
             <label>Tu WhatsApp</label>
             <input type="tel" id="inp-telefono" placeholder="+54 9 298 123-4567">
@@ -120,21 +124,27 @@
                 <strong>Precio:</strong> <span id="res-precio"></span>
             </div>
 
+            <!-- ✅ BOTÓN MERCADO PAGO BIEN VISIBLE Y APARTE -->
             <a id="btn-mercadopago" class="btn btn-mercadopago" target="_blank">💳 PAGAR CON MERCADO PAGO</a>
+            
+            <!-- Link para copiar si lo necesitás -->
             <p style="color:var(--textoSec); font-size:13px; margin-top:16px; margin-bottom:4px;">📋 Link para copiar y pegar:</p>
             <div id="link-mp-copiable" class="link-copiable"></div>
+
             <a id="btn-whatsapp" class="btn btn-whatsapp" target="_blank">💬 ENVIAR POR WHATSAPP</a>
-            <button class="btn btn-gris" style="width:100%; margin-top:16px;" onclick="volverAReserva()">🔄 Reservar otro turno</button>
+            
+            <button class="btn btn-gris" style="width:100%; margin-top:16px;" onclick="volverAReserva()">🔄 Reservar otro</button>
         </div>
     </div>
 </div>
 
+<!-- PANEL ADMINISTRATIVO COMPLETO -->
 <div id="pagina-admin" class="oculto">
     <div class="caja" id="caja-login">
         <h2 style="text-align:center; border:none;">🔒 Acceso Administrativo</h2>
         <input type="password" id="input-pass-admin" placeholder="Ingresar contraseña">
         <button class="btn btn-dorado" onclick="ingresarAdmin()">Ingresar</button>
-        <button class="btn btn-gris" style="width:100%; margin-top:12px;" onclick="irA('reservar')">← Volver a Reservas</button>
+        <button class="btn btn-gris" style="width:100%; margin-top:12px;" onclick="irA('reservar')">← Volver</button>
     </div>
 
     <div id="panel-administracion" class="oculto">
@@ -142,10 +152,11 @@
             <div class="tab activo" onclick="cambiarPestaña('turnos')">📋 Turnos</div>
             <div class="tab" onclick="cambiarPestaña('finanzas')">💰 Finanzas</div>
             <div class="tab" onclick="cambiarPestaña('barberos')">🧑‍💼 Barberos</div>
-            <div class="tab" onclick="cambiarPestaña('servicios')">✂️ Servicios</div>
+            <div class="tab" onclick="cambiarPestaña('servicios')">💇 Servicios</div>
             <div class="tab" onclick="cambiarPestaña('ajustes')">⚙️ Ajustes</div>
         </div>
 
+        <!-- TURNOS -->
         <div id="pestaña-turnos">
             <div class="caja">
                 <div class="filtros">
@@ -158,6 +169,7 @@
             </div>
         </div>
 
+        <!-- FINANZAS COMPLETO -->
         <div id="pestaña-finanzas" class="oculto">
             <div class="caja">
                 <h2>💰 Finanzas</h2>
@@ -168,18 +180,22 @@
                 </div>
                 <div class="balance-final"><strong>Saldo Actual</strong><div class="monto-total" id="saldo-total">$0</div></div>
                 <div class="divisor"></div>
-                <h3>➕ Agregar Movimiento</h3>
+                <h3>➕ Agregar Movimiento Manual</h3>
+                <label>Tipo</label>
                 <select id="sel-tipo-mov">
                     <option value="ingreso">🟢 Ingreso</option>
                     <option value="gasto">🟠 Gasto</option>
                     <option value="inversion">🟣 Inversión</option>
                 </select>
-                <input type="text" id="desc-mov" placeholder="Descripción">
-                <input type="number" id="monto-mov" placeholder="Monto $">
+                <label>Descripción</label>
+                <input type="text" id="desc-mov" placeholder="Ej: Productos, alquiler...">
+                <label>Monto $</label>
+                <input type="number" id="monto-mov" min="1">
+                <label>Fecha</label>
                 <input type="date" id="fecha-mov">
                 <button class="btn btn-dorado" onclick="agregarMovimiento()">💾 Guardar</button>
                 <div class="divisor"></div>
-                <h3>📊 Historial</h3>
+                <h3>📊 Historial — Eliminar por separado</h3>
                 <div class="filtros">
                     <button class="filtro activo" onclick="cambiarFiltroMov('todos')">Todos</button>
                     <button class="filtro" onclick="cambiarFiltroMov('ingreso')">🟢 Ingresos</button>
@@ -190,18 +206,21 @@
             </div>
         </div>
 
+        <!-- BARBEROS + HORARIOS INDIVIDUALES -->
         <div id="pestaña-barberos" class="oculto">
             <div class="caja">
                 <h3>Agregar Barbero</h3>
                 <input type="text" id="nombre-nuevo-barbero" placeholder="Nombre del barbero">
                 <button class="btn btn-dorado" onclick="agregarBarbero()">➕ Agregar</button>
                 <div class="divisor"></div>
-                <h3>Horarios por Barbero</h3>
+                <h3>🧑‍💼 Barberos y Horarios</h3>
+                <label>Editar horario de:</label>
                 <select id="sel-barbero-horario" onchange="cargarFormularioHorario()">
                     <option value="">— Elegí barbero —</option>
                 </select>
                 <div id="form-horario-barbero" class="oculto" style="margin-top:20px;">
-                    <p style="color:var(--textoSec); font-size:12px; margin-bottom:12px;">Marcá los días que trabaja y configurá horarios de mañana y tarde</p>
+                    <h3>📅 Horario Semanal</h3>
+                    <p style="color:var(--textoSec); font-size:12px; margin-bottom:12px;">Marcá los días que trabaja y configurá mañana/tarde</p>
                     <div id="contenedor-dias"></div>
                     <button class="btn btn-dorado" onclick="guardarHorarioBarbero()">💾 Guardar Horario</button>
                 </div>
@@ -211,11 +230,12 @@
             </div>
         </div>
 
+        <!-- SERVICIOS -->
         <div id="pestaña-servicios" class="oculto">
             <div class="caja">
                 <h3>Agregar Servicio</h3>
                 <div class="fila-doble">
-                    <input type="text" id="nombre-nuevo-servicio" placeholder="Nombre del servicio">
+                    <input type="text" id="nombre-nuevo-servicio" placeholder="Nombre">
                     <input type="number" id="precio-nuevo-servicio" placeholder="Precio $">
                 </div>
                 <button class="btn btn-dorado" onclick="agregarServicio()">➕ Agregar</button>
@@ -224,14 +244,15 @@
             </div>
         </div>
 
+        <!-- AJUSTES -->
         <div id="pestaña-ajustes" class="oculto">
             <div class="caja">
                 <h3>⚙️ Configuración General</h3>
-                <label>Link de Mercado Pago</label>
-                <input type="text" id="link-mercadopago" placeholder="https://link.mercadopago.com.ar/tu-link">
-                <label>WhatsApp de la Barbería</label>
+                <label>🔗 Enlace de Mercado Pago</label>
+                <input type="text" id="link-mercadopago" placeholder="https://link.mercadopago.com.ar/tu-enlace">
+                <label>📱 WhatsApp de la Barbería</label>
                 <input type="tel" id="numero-whatsapp" value="5492984548329">
-                <label>Contraseña de Administrador</label>
+                <label>🔑 Contraseña de Administrador</label>
                 <input type="password" id="nueva-pass-admin" placeholder="Dejar vacío para no cambiar">
                 <button class="btn btn-dorado" onclick="guardarAjustes()">💾 Guardar Cambios</button>
             </div>
@@ -245,6 +266,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <script>
+// === CONFIGURACIÓN FIREBASE ===
 const firebaseConfig = {
   apiKey: "AIzaSyAe-Ysqg7w8HzQ707MEqd4tiqH7qZWHGMA",
   authDomain: "mistico-barberia.firebaseapp.com",
@@ -259,6 +281,7 @@ const refTurnos = db.ref('turnos');
 const refConfig = db.ref('configuracion');
 const refMovimientos = db.ref('movimientos');
 
+// === DATOS INICIALES ===
 const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 let configuracion = {
   contrasena: 'admin123',
@@ -278,18 +301,15 @@ let configuracion = {
   servicios: [
     {nombre: 'Corte de cabello', precio: 5000},
     {nombre: 'Arreglo de barba', precio: 3500},
-    {nombre: 'Corte + Barba completa', precio: 7500},
+    {nombre: 'Corte + Barba', precio: 7500},
     {nombre: 'Afeitado clásico', precio: 4000}
   ]
 };
 
-let filtroTurnos = 'todos', filtroMov = 'todos', paginaActual = 'reservar', barberoEditando = null;
+let filtroTurnos = 'todos', filtroMov = 'todos', paginaActual = 'reservar';
+let barberoEditando = null;
 
-// CARGA INMEDIATA - APARECEN DE ENTRADA SIN ESPERAR
-actualizarListasSeleccion();
-listarListaServicios();
-listarListaBarberos();
-
+// === CARGA CONFIGURACIÓN + ASEGURA QUE SIEMPRE HAYA OPCIONES CARGADAS ===
 refConfig.on('value', (snapshot) => {
   if(snapshot.exists()) {
     const datosGuardados = snapshot.val();
@@ -298,9 +318,8 @@ refConfig.on('value', (snapshot) => {
       configuracion.barberos = configuracion.barberos.map(n => crearBarberoNuevo(n));
     }
   }
+  // ✅ CARGA SIEMPRE LOS SELECTORES INCLUSO ANTES DE QUE FIREBASE RESPONDA
   actualizarListasSeleccion();
-  listarListaServicios();
-  listarListaBarberos();
 });
 
 function crearBarberoNuevo(nombre){
@@ -312,6 +331,7 @@ function crearBarberoNuevo(nombre){
   return {nombre, horarios};
 }
 
+// === NAVEGACIÓN ===
 function irA(pagina){
   paginaActual = pagina;
   document.getElementById('pagina-reservar').classList.add('oculto');
@@ -332,23 +352,4 @@ function ingresarAdmin(){
     document.getElementById('caja-login').classList.add('oculto');
     document.getElementById('panel-administracion').classList.remove('oculto');
     cambiarPestaña('turnos');
-    document.getElementById('numero-whatsapp').value = configuracion.whatsapp;
-    document.getElementById('link-mercadopago').value = configuracion.linkMercadoPago || '';
-  }else{ alert('❌ Contraseña incorrecta'); }
-}
-
-function actualizarListasSeleccion(){
-  const selB = document.getElementById('sel-barbero');
-  const selBH = document.getElementById('sel-barbero-horario');
-  const selS = document.getElementById('sel-servicio');
-  if(!selB || !selS) return;
-  
-  selB.innerHTML = '<option value="">— Seleccionar barbero —</option>';
-  selBH.innerHTML = '<option value="">— Elegí barbero —</option>';
-  configuracion.barberos.forEach(b => {
-    selB.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
-    selBH.innerHTML += `<option value="${b.nombre}">${b.nombre}</option>`;
-  });
-  
-  selS.innerHTML = '<option value="">— Seleccionar servicio —</option>';
-  configuracion.servicios.forEach(s => {
+    document.getElementById('numero-whatsapp').value = configuracio
